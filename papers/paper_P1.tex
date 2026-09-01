@@ -66,10 +66,11 @@ $B_{n+1}=B_n^{\,a_{n+1}}B_{n-1}$ governed by the continued fraction of
 $\log_2 3$. As an unconditional byproduct we show that the number of
 potential counterexamples up to $N$ --- integers whose orbit never
 descends below its starting point --- is $O(N^{H(\theta)+o(1)})
-=O(N^{0.950})$, the same entropy exponent. The core arithmetic lemmas
-(the climbing towers $-1\bmod 2^m$, the affine identity, the collapse and
-persistence lemmas behind the robustness theorem, and the rotation lemma)
-are machine-verified in Lean~4 from the standard axioms. We
+=O(N^{0.950})$, the same entropy exponent. The counting theorem itself, and the core
+arithmetic lemmas behind the robustness and rate theorems (the climbing
+towers $-1\bmod 2^m$, the affine identity, the collapse and persistence
+lemmas, and the rotation lemma), are machine-verified in Lean~4 from the
+standard axioms. We
 emphasize that the density statement underlying (ii) is classical (Terras
 1976, Everett 1977); our contribution is the \emph{uniform lower bound against
 arbitrary certificate systems}, the exact non-asymptotic constants, and the
@@ -137,11 +138,13 @@ and arbitrary mixtures of depths, and we establish the following.
   fraction of $\log_2 3$; and the language of climbing words is not
   regular, so the certificate frontier admits no finite-automaton
   compression.
-\item[(iv)] \emph{Machine verification}: the core arithmetic lemmas ---
-  the climbing towers $-1\bmod 2^m$, the affine identity with its
-  remainder bound, both halves of the adaptive collapse lemma, the
-  persistence step behind Theorem~A$'$, and the rotation lemma behind
-  Theorem~B --- are verified in Lean~4 from the standard axioms alone
+\item[(iv)] \emph{Machine verification}: Theorem~A itself is verified
+  in Lean~4 in an abstract certificate-system formulation (as an
+  injection from climbing classes into deep certificates), and so are
+  the core arithmetic lemmas behind Theorems~A$'$ and B --- the
+  climbing towers $-1\bmod 2^m$, the affine identity with its remainder
+  bound, both halves of the adaptive collapse lemma, the persistence
+  step, and the rotation lemma --- all from the standard axioms alone
   (Section~\ref{sec:artifacts}).
 \item[(v)] \emph{A verified computational artifact}: a depth-$20$
   certificate system (4404 certificates, exact cover of $\N\setminus\{1\}$
@@ -390,6 +393,9 @@ $\binom{k}{e}\ge 2^{kH(e/k)}/(k+1)$.
 \end{proof}
 
 \begin{remark}
+Theorem~A is machine-verified in an abstract certificate-system
+formulation, with the count rendered as an injection from climbing
+classes into deep certificates (Section~\ref{sec:artifacts}).
 The proof uses nothing about the internal structure of the certificates
 beyond Lemmas~\ref{lem:nocert} and \ref{lem:locality}; in particular it
 applies verbatim to systems mixing arbitrary depths, refining by odd
@@ -1007,9 +1013,30 @@ compiled with core Lean only (no external libraries), toolchain pinned to
   conclusion and the literal climbing of the rotated word was
   additionally cross-checked exhaustively for all words of length
   $\le 14$.
+\item \texttt{Counting.lean}: \emph{Theorem A itself}, in an abstract
+  certificate-system formulation. A system is abstracted as an index
+  type $I$ with depth $\mathrm{dep}\,i$, atom $\mathrm{atom}\,i$, and a
+  coverage predicate, subject to exactly the three hypotheses used in
+  the proof: containment in the dyadic atom, descent at the
+  certificate's own depth on every covered integer, and coverage of all
+  $n\ge N_0$ (which absorbs exceptional sets, odd-modulus refinements,
+  and the finite directly verified set). The conclusion
+  (\texttt{counting\_lower\_bound}) is constructive: an
+  \emph{injection} from the climbing residues mod $2^K$ into
+  $\{i: \mathrm{dep}\,i>K\}$ --- the statement ``at least $c(K)$
+  certificates of depth $>K$'' rendered without cardinality machinery
+  --- together with the corollary \texttt{no\_finite\_system} ($\forall
+  K\,\exists i,\ \mathrm{dep}\,i>K$, witnessed by the all-ones class).
+  The key lemma is \texttt{odds\_mod}: the first $j$ parities depend
+  only on $n \bmod 2^j$ (the part of Lemma~\ref{lem:terras} the proof
+  uses). Axioms within \texttt{[propext, Classical.choice,
+  Quot.sound]}.
 \end{itemize}
-The counting and rate theorems themselves are verified by conventional
-proof plus the independent computations described above.
+Of the main results, Theorem~A is thus machine-verified in full (modulo
+the trivial reading of an injection as a cardinality bound), and
+Theorems~A$'$ and B have their arithmetic cores machine-verified; the
+remaining steps of A$'$ and B, and Theorems~C--G, are verified by
+conventional proof plus the independent computations described above.
 
 \subsection{Reproducibility and data availability}
 All computations use exact integer (or exact rational) arithmetic. The
@@ -1032,6 +1059,8 @@ artifact & SHA-256\\
  & \texttt{075f33d05a38b6e26612bad2cf50b2f3}\\
 \texttt{Rotation.lean} & \texttt{20f91338f3d623a496ce1d0a6b1ff775}\\[-2pt]
  & \texttt{75f14921756e17dc13ab48bd5863b97a}\\
+\texttt{Counting.lean} & \texttt{09619f3b7862934a14ef7fb9ed9d4646}\\[-2pt]
+ & \texttt{a50ea425a4622f819acf27bded5a4396}\\
 \bottomrule
 \end{tabular}
 \end{center}
