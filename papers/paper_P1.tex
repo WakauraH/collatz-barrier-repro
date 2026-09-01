@@ -67,9 +67,9 @@ $\log_2 3$. As an unconditional byproduct we show that the number of
 potential counterexamples up to $N$ --- integers whose orbit never
 descends below its starting point --- is $O(N^{H(\theta)+o(1)})
 =O(N^{0.950})$, the same entropy exponent. The core arithmetic lemmas
-(the climbing towers $-1\bmod 2^m$, the affine identity, and the collapse
-and persistence lemmas behind the robustness theorem) are machine-verified
-in Lean~4 from the standard axioms. We
+(the climbing towers $-1\bmod 2^m$, the affine identity, the collapse and
+persistence lemmas behind the robustness theorem, and the rotation lemma)
+are machine-verified in Lean~4 from the standard axioms. We
 emphasize that the density statement underlying (ii) is classical (Terras
 1976, Everett 1977); our contribution is the \emph{uniform lower bound against
 arbitrary certificate systems}, the exact non-asymptotic constants, and the
@@ -139,9 +139,10 @@ and arbitrary mixtures of depths, and we establish the following.
   compression.
 \item[(iv)] \emph{Machine verification}: the core arithmetic lemmas ---
   the climbing towers $-1\bmod 2^m$, the affine identity with its
-  remainder bound, both halves of the adaptive collapse lemma, and the
-  persistence step behind Theorem~A$'$ --- are verified in Lean~4 from
-  the standard axioms alone (Section~\ref{sec:artifacts}).
+  remainder bound, both halves of the adaptive collapse lemma, the
+  persistence step behind Theorem~A$'$, and the rotation lemma behind
+  Theorem~B --- are verified in Lean~4 from the standard axioms alone
+  (Section~\ref{sec:artifacts}).
 \item[(v)] \emph{A verified computational artifact}: a depth-$20$
   certificate system (4404 certificates, exact cover of $\N\setminus\{1\}$
   up to the climbing classes, density $97.39\%$) checked by an independent
@@ -661,6 +662,18 @@ because $S_i\ge S_{j^*}$ and $S_k>0$. Hence all prefix sums of $b'$ are
 positive, which is the climbing condition.
 \end{proof}
 
+\begin{remark}[machine verification; irrationality is removable]
+\label{rem:rotlean}
+The lemma is machine-verified (Section~\ref{sec:artifacts}) in a purely
+integer form: comparisons $S_a\le S_b$ are encoded as the cross-multiplied
+inequalities $3^{e_a}2^{b}\le 3^{e_b}2^{a}$, and the rotated word's prefix
+conditions become the two families of integer inequalities produced by the
+proof. The formalization selects the \emph{last} index attaining the
+minimum, which yields the required strictness on the first group directly
+--- so the appeal to the irrationality of $\theta$ in the proof above is a
+convenience of the real-variable formulation, not a genuine hypothesis.
+\end{remark}
+
 \begin{thmB}
 For every $k\ge 1$, with $\theta=\log_3 2$,
 \[
@@ -985,6 +998,15 @@ compiled with core Lean only (no external libraries), toolchain pinned to
   (Lemma~\ref{lem:persist}) as \texttt{climb\_extend}; axioms within
   \texttt{[propext, Classical.choice, Quot.sound]}, the standard Lean
   axioms.
+\item \texttt{Rotation.lean}: the rotation lemma
+  (Lemma~\ref{lem:rotation}) in the integer cross-multiplied form of
+  Remark~\ref{rem:rotlean} (\texttt{rotation}, built on a verified
+  last-minimum scan \texttt{am} with its minimality and strictness
+  lemmas); axioms within \texttt{[propext, Classical.choice,
+  Quot.sound]}. The correspondence between the cross-multiplied
+  conclusion and the literal climbing of the rotated word was
+  additionally cross-checked exhaustively for all words of length
+  $\le 14$.
 \end{itemize}
 The counting and rate theorems themselves are verified by conventional
 proof plus the independent computations described above.
@@ -1008,6 +1030,8 @@ artifact & SHA-256\\
  & \texttt{7a3e2f65c0251bae1c90683492f4ec7d}\\
 \texttt{Collapse.lean} & \texttt{08191fc7b0114d8504a9c930ae911ad7}\\[-2pt]
  & \texttt{075f33d05a38b6e26612bad2cf50b2f3}\\
+\texttt{Rotation.lean} & \texttt{20f91338f3d623a496ce1d0a6b1ff775}\\[-2pt]
+ & \texttt{75f14921756e17dc13ab48bd5863b97a}\\
 \bottomrule
 \end{tabular}
 \end{center}
