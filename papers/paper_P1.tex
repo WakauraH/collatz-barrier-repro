@@ -1,4 +1,4 @@
-\documentclass[11pt]{amsart}
+\documentclass[11pt]{article}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage[margin=1.1in]{geometry}
 \usepackage{booktabs}
@@ -31,58 +31,42 @@
 
 \title{Certificate complexity of uniform descent\\ for the $3x+1$ problem}
 
-\author{Hikaru Wakaura}
-\address{QuantScape Inc., 4-11-18, Manshon-Shimizudai, Meguro, Tokyo, 153-0064, Japan}
-\email{hikaruwakaura@gmail.com}
+\author{Hikaru Wakaura\thanks{QuantScape Inc., 4-11-18,
+Manshon-Shimizudai, Meguro, Tokyo, 153-0064, Japan. Corresponding author;
+email: \texttt{hikaruwakaura@gmail.com}.
+% TODO(author): add ORCID iD at submission.
+}}
 \date{\today}
-\subjclass[2020]{Primary 11B83; Secondary 68R15, 03F20, 11J86}
-\keywords{$3x+1$ problem, Collatz conjecture, proof complexity, descent
-certificate, stopping time, Sturmian word, linear forms in logarithms,
-machine-verified proof}
 
 \begin{document}
 
+\maketitle
+
 \begin{abstract}
-We formalize the most natural proof strategy for the $3x+1$ (Collatz) problem
---- partition the positive integers into congruence classes and certify
-uniform descent on each class by an affine identity --- as a proof system of
-\emph{dyadic affine descent certificates}, and we prove quantitative lower
-bounds on its complexity. Let $c(k)$ denote the number of residues mod $2^k$
-whose length-$k$ parity vector satisfies $3^{e_j}>2^j$ for every prefix
-(``climbing classes''). We prove: (i) every correct certificate system
-contains, for every $k$, at least $c(k)$ certificates of dyadic depth
-exceeding $k$ --- in particular no finite system exists --- and the bound is
-robust: certificates certifying descent at a variable stopping time over
-arbitrary finite unions of congruence classes (any eventually periodic
-scope) collapse to the same canonical frontier and obey the same count;
-(ii) the
-non-asymptotic sandwich $\binom{k}{\ceil{\theta k}}/k \le c(k) \le
-(k+1)\binom{k}{\ceil{\theta k}}$ with $\theta=\log_3 2$, hence the certificate
-growth rate is exactly $\gamma=H(\theta)=0.949955\ldots$, the binary entropy
-of $\theta$; (iii) the ``frontier language'' of climbing words is not regular;
-(iv) the climbing walk is driven by the Sturmian word of slope $\theta$, and
-its block transfer matrices obey the standard-word recursion
-$B_{n+1}=B_n^{\,a_{n+1}}B_{n-1}$ governed by the continued fraction of
-$\log_2 3$. As an unconditional byproduct we show that the number of
-potential counterexamples up to $N$ --- integers whose orbit never
-descends below its starting point --- is $O(N^{H(\theta)+o(1)})
-=O(N^{0.950})$, the same entropy exponent. The counting theorem itself, and the core
-arithmetic lemmas behind the robustness and rate theorems (the climbing
-towers $-1\bmod 2^m$, the affine identity, the collapse and persistence
-lemmas, and the rotation lemma), are machine-verified in Lean~4 from the
-standard axioms. We
-emphasize that the density statement underlying (ii) is classical (Terras
-1976, Everett 1977); our contribution is the \emph{uniform lower bound against
-arbitrary certificate systems}, the exact non-asymptotic constants, and the
-Sturmian/automatic-structure analysis. As complements we prove two local
-obstructions: no bounded function $\psi(n \bmod 2^d)$ makes
-$\log_2 n+\psi$ a one-step Lyapunov function, and every finite-window
-constraint family valid on non-descending orbit segments is realized by
-genuine integer segments, so finite-window hierarchies cannot exclude
-climbing statistics.
+We formalize the most natural proof strategy for the $3x+1$ (Collatz)
+problem --- partition the integers into congruence classes and certify
+uniform descent on each class by an affine identity --- as a proof system
+of dyadic affine descent certificates, and we prove quantitative lower
+bounds on its complexity. Every correct certificate system contains, for
+every $k$, at least $c(k)$ certificates of dyadic depth exceeding $k$,
+where $c(k)$ counts the climbing classes mod $2^k$; the growth rate of
+$c(k)$ is exactly the binary entropy $H(\log_3 2)=0.9500$, with
+non-asymptotic two-sided constants. The bound is robust under disjunctions
+of congruence classes of arbitrary moduli and adaptive stopping times, and
+the same collapse yields an unconditional bound $N^{H(\log_3 2)}$ on the
+number of potential counterexamples up to $N$. The certificate frontier is
+driven by the Sturmian word of slope $\log_3 2$ and is not regular. The
+counting theorem and the core lemmas are machine-verified in Lean~4.
 \end{abstract}
 
-\maketitle
+\noindent\textbf{Keywords:} $3x+1$ problem; Collatz conjecture; proof
+complexity; descent certificate; stopping time; Sturmian word; linear
+forms in logarithms; machine-verified proof.
+
+\noindent\textbf{2020 Mathematics Subject Classification:} Primary 11B83;
+Secondary 68R15, 03F20, 11J86.
+
+\noindent\textbf{Word count:} approximately 6{,}700 words.
 
 \section{Introduction}\label{sec:intro}
 
@@ -1051,15 +1035,15 @@ hashes of the frozen artifacts:
 \toprule
 artifact & SHA-256\\
 \midrule
-\texttt{certificates.json} & \texttt{d32a24e4b34eb33a0aa8f01406354ae2}\\[-2pt]
+\texttt{certificates.json} & \texttt{d32a24e4b34eb33a0aa8f01406354ae2}\\
  & \texttt{2ddd65a7329b3d3309197150ad3d78fc}\\
-\texttt{Barrier.lean} & \texttt{c416508cda41b0df105bae91801d70c3}\\[-2pt]
+\texttt{Barrier.lean} & \texttt{c416508cda41b0df105bae91801d70c3}\\
  & \texttt{7a3e2f65c0251bae1c90683492f4ec7d}\\
-\texttt{Collapse.lean} & \texttt{08191fc7b0114d8504a9c930ae911ad7}\\[-2pt]
+\texttt{Collapse.lean} & \texttt{08191fc7b0114d8504a9c930ae911ad7}\\
  & \texttt{075f33d05a38b6e26612bad2cf50b2f3}\\
-\texttt{Rotation.lean} & \texttt{20f91338f3d623a496ce1d0a6b1ff775}\\[-2pt]
+\texttt{Rotation.lean} & \texttt{20f91338f3d623a496ce1d0a6b1ff775}\\
  & \texttt{75f14921756e17dc13ab48bd5863b97a}\\
-\texttt{Counting.lean} & \texttt{09619f3b7862934a14ef7fb9ed9d4646}\\[-2pt]
+\texttt{Counting.lean} & \texttt{09619f3b7862934a14ef7fb9ed9d4646}\\
  & \texttt{a50ea425a4622f819acf27bded5a4396}\\
 \bottomrule
 \end{tabular}
@@ -1118,6 +1102,24 @@ data that governs the cycle route. We take this coincidence as evidence
 that the difficulty quantified here is intrinsic to the problem and not to
 one formalization.
 
+\section*{Funding}
+
+No funding was obtained for this work.
+
+\section*{Disclosure statement}
+
+The author reports there are no competing interests to declare.
+
+\section*{Declaration of generative AI use}
+
+Generative AI (Anthropic's Claude) was used, under the author's direction,
+to assist in drafting and revising the manuscript, in developing and
+checking the computational scripts and the Lean~4 proof files, and in
+searching the literature. All definitions, theorems, and proofs were
+reviewed by the author, the computational claims are backed by the
+verifiable artifacts described in this article, and the author takes full
+responsibility for its content.
+
 \section*{Data availability statement}
 % TODO(author): confirm the repository URL / DOI before submission.
 All code and data supporting this study --- the certificate artifact, the
@@ -1130,33 +1132,6 @@ DOI-stamped archival snapshot of the exact version used here will be
 deposited upon acceptance. The same material is included as the
 supplementary bundle of this submission.
 
-\appendix
-
-\section{The standard cycle bound (reproduction)}\label{app:cycle}
-
-For completeness we record the cycle bound used in
-Section~\ref{sec:discussion}; the method is that of Eliahou
-\cite{Eliahou1993} with the current verification bound, and no novelty is
-claimed. Let a nontrivial cycle of the odd-to-odd accelerated map have odd
-elements $m_1,\dots,m_K$ with $2$-adic valuations summing to $A$.
-Multiplying the relations $m_{j+1}2^{a_j}=3m_j+1$ around the cycle gives
-$2^A=\prod_j(3+1/m_j)$, hence with $M=\min_j m_j$,
-\[
-0<A-K\log_2 3\le \frac{K}{3M\ln 2}.
-\]
-With $M>2^{68}$ \cite{Barina2021} the right side is below
-$K\cdot 2^{-69}$, forcing $A=\ceil{K\log_2 3}$ and making
-$\|K\log_2 3\|^{+}$ (the distance to the integer \emph{above}) at most
-$K\cdot 2^{-69}$. Running the one-sided ladder of best approximations of
-$\log_2 3$ (mediant steps between convergents, compared by exact integer
-powers $2^p$ vs $3^q$) shows the smallest such $K$ satisfies
-\[
-K\ \ge\ 8{,}963{,}457{,}696,
-\]
-so any nontrivial cycle has more than $2.3\times 10^{10}$ steps of the map
-$C$. Stronger bounds via $m$-cycle theory are known
-\cite{SimonsDeWeger2005}, and high cycles have recently been eliminated
-altogether \cite{Knight2026}.
 
 \begin{thebibliography}{99}
 
@@ -1269,5 +1244,34 @@ M.~Lothaire,
 Encyclopedia Math. Appl. \textbf{90}, Cambridge University Press, 2002.
 
 \end{thebibliography}
+
+\appendix
+
+\section{The standard cycle bound (reproduction)}\label{app:cycle}
+
+For completeness we record the cycle bound used in
+Section~\ref{sec:discussion}; the method is that of Eliahou
+\cite{Eliahou1993} with the current verification bound, and no novelty is
+claimed. Let a nontrivial cycle of the odd-to-odd accelerated map have odd
+elements $m_1,\dots,m_K$ with $2$-adic valuations summing to $A$.
+Multiplying the relations $m_{j+1}2^{a_j}=3m_j+1$ around the cycle gives
+$2^A=\prod_j(3+1/m_j)$, hence with $M=\min_j m_j$,
+\[
+0<A-K\log_2 3\le \frac{K}{3M\ln 2}.
+\]
+With $M>2^{68}$ \cite{Barina2021} the right side is below
+$K\cdot 2^{-69}$, forcing $A=\ceil{K\log_2 3}$ and making
+$\|K\log_2 3\|^{+}$ (the distance to the integer \emph{above}) at most
+$K\cdot 2^{-69}$. Running the one-sided ladder of best approximations of
+$\log_2 3$ (mediant steps between convergents, compared by exact integer
+powers $2^p$ vs $3^q$) shows the smallest such $K$ satisfies
+\[
+K\ \ge\ 8{,}963{,}457{,}696,
+\]
+so any nontrivial cycle has more than $2.3\times 10^{10}$ steps of the map
+$C$. Stronger bounds via $m$-cycle theory are known
+\cite{SimonsDeWeger2005}, and high cycles have recently been eliminated
+altogether \cite{Knight2026}.
+
 
 \end{document}
