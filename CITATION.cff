@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: >-
+  If you use this repository, please cite it as below, and cite the two
+  companion papers for the mathematical results.
+title: "collatz-barrier-repro: reproduction repository for the Collatz
+  certificate-complexity barrier and the 3-adic Syracuse mixing rate"
+type: software
+authors:
+  - family-names: Wakaura
+    given-names: Hikaru
+    affiliation: QuantScape Inc.
+    email: hikaruwakaura@gmail.com
+version: 1.0.0
+date-released: 2026-09-01
+license: MIT
+references:
+  - type: article
+    title: "Certificate complexity of uniform descent for the 3x+1 problem"
+    authors:
+      - family-names: Wakaura
+        given-names: Hikaru
+    year: 2026
+    notes: "preprint; submitted"
+  - type: article
+    title: "The 3-adic mixing rate of the Syracuse random variable:
+      reductions, a boundary-layer mechanism, and a sharp-rate conjecture"
+    authors:
+      - family-names: Wakaura
+        given-names: Hikaru
+    year: 2026
+    notes: "preprint; submitted"

@@ -1,0 +1,1201 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newtheorem*{thmA}{Theorem A (certificate-counting lower bound)}
+\newtheorem*{thmAp}{Theorem A$'$ (robustness under disjunction and adaptive stopping)}
+\newtheorem*{thmB}{Theorem B (exact growth rate)}
+\newtheorem*{thmC}{Theorem C (Sturmian letter factorization)}
+\newtheorem*{thmD}{Theorem D (standard-word block recursion)}
+\newtheorem*{thmE}{Theorem E (non-regularity of the frontier)}
+\newtheorem*{thmF}{Theorem F (no bounded dyadic one-step Lyapunov function)}
+\newtheorem*{thmG}{Theorem G (cylinder-local realization)}
+
+\DeclareMathOperator{\ord}{ord}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\ceil}[1]{\lceil #1\rceil}
+\newcommand{\floor}[1]{\lfloor #1\rfloor}
+
+\title{Certificate complexity of uniform descent\\ for the $3x+1$ problem}
+
+\author{Hikaru Wakaura}
+\address{QuantScape Inc., 4-11-18, Manshon-Shimizudai, Meguro, Tokyo, 153-0064, Japan}
+\email{hikaruwakaura@gmail.com}
+\date{\today}
+\subjclass[2020]{Primary 11B83; Secondary 68R15, 03F20, 11J86}
+\keywords{$3x+1$ problem, Collatz conjecture, proof complexity, descent
+certificate, stopping time, Sturmian word, linear forms in logarithms,
+machine-verified proof}
+
+\begin{document}
+
+\begin{abstract}
+We formalize the most natural proof strategy for the $3x+1$ (Collatz) problem
+--- partition the positive integers into congruence classes and certify
+uniform descent on each class by an affine identity --- as a proof system of
+\emph{dyadic affine descent certificates}, and we prove quantitative lower
+bounds on its complexity. Let $c(k)$ denote the number of residues mod $2^k$
+whose length-$k$ parity vector satisfies $3^{e_j}>2^j$ for every prefix
+(``climbing classes''). We prove: (i) every correct certificate system
+contains, for every $k$, at least $c(k)$ certificates of dyadic depth
+exceeding $k$ --- in particular no finite system exists --- and the bound is
+robust: certificates certifying descent at a variable stopping time over
+arbitrary finite unions of congruence classes (any eventually periodic
+scope) collapse to the same canonical frontier and obey the same count;
+(ii) the
+non-asymptotic sandwich $\binom{k}{\ceil{\theta k}}/k \le c(k) \le
+(k+1)\binom{k}{\ceil{\theta k}}$ with $\theta=\log_3 2$, hence the certificate
+growth rate is exactly $\gamma=H(\theta)=0.949955\ldots$, the binary entropy
+of $\theta$; (iii) the ``frontier language'' of climbing words is not regular;
+(iv) the climbing walk is driven by the Sturmian word of slope $\theta$, and
+its block transfer matrices obey the standard-word recursion
+$B_{n+1}=B_n^{\,a_{n+1}}B_{n-1}$ governed by the continued fraction of
+$\log_2 3$. As an unconditional byproduct we show that the number of
+potential counterexamples up to $N$ --- integers whose orbit never
+descends below its starting point --- is $O(N^{H(\theta)+o(1)})
+=O(N^{0.950})$, the same entropy exponent. The core arithmetic lemma
+(classes $-1 \bmod 2^m$ climb for $m-1$
+steps with unit $2$-adic valuations) is machine-verified in Lean~4. We
+emphasize that the density statement underlying (ii) is classical (Terras
+1976, Everett 1977); our contribution is the \emph{uniform lower bound against
+arbitrary certificate systems}, the exact non-asymptotic constants, and the
+Sturmian/automatic-structure analysis. As complements we prove two local
+obstructions: no bounded function $\psi(n \bmod 2^d)$ makes
+$\log_2 n+\psi$ a one-step Lyapunov function, and every finite-window
+constraint family valid on non-descending orbit segments is realized by
+genuine integer segments, so finite-window hierarchies cannot exclude
+climbing statistics.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+The $3x+1$ problem (Collatz conjecture) asserts that iterating
+$C(n)=n/2$ for even $n$ and $C(n)=3n+1$ for odd $n$ eventually reaches $1$
+from every positive integer. Despite its elementary statement, the problem
+has resisted every known technique; see the surveys of Lagarias
+\cite{Lagarias1985,Lagarias2010} for its history. Verified convergence now
+extends to all $n<2^{68}$ \cite{Barina2021}, density-one convergence has
+been known since Terras \cite{Terras1976} and Everett \cite{Everett1977},
+and Tao \cite{Tao2022} proved that almost all orbits (in logarithmic
+density) attain almost bounded values.
+
+Faced with such a problem, the strategy that nearly every newcomer --- and
+many published attempts --- adopt is the same folk recipe: split the
+integers into congruence classes mod $2^k$, prove on each class an affine
+identity forcing descent below the starting point, and conclude by strong
+induction. The recipe succeeds on a set of classes of density approaching
+$1$, and this is precisely the content of the classical density theorems.
+However, the recipe never seems to terminate: no matter how deep the case
+analysis is pushed, a residue of unresolved classes survives, and it has
+remained unquantified \emph{whether this is an artifact of particular
+implementations or a provable property of the strategy itself}.
+
+Here we prove that it is a provable property of the strategy, and we
+determine its exact cost. We formalize the recipe as a proof system of
+\emph{dyadic affine descent certificates} (Definition~\ref{def:cert}),
+flexible enough to cover finite exceptional sets, refinements by odd moduli,
+and arbitrary mixtures of depths, and we establish the following.
+
+\begin{enumerate}
+\item[(i)] \emph{A counting lower bound against all systems}
+  (Theorem~A): every correct certificate system contains, for every $k$, at
+  least $c(k)$ certificates of dyadic depth exceeding $k$, where $c(k)$ is
+  the number of \emph{climbing classes} mod $2^k$. In particular no finite
+  certificate system exists, and the depth distribution of any correct
+  system has exponentially heavy tails at every scale. The bound is robust
+  (Theorem~A$'$): allowing each certificate to certify descent at a
+  \emph{variable} stopping time, over a \emph{disjunction} of congruence
+  classes of arbitrary moduli, changes nothing --- adaptive stopping
+  collapses to the canonical first-descent time, and each constituent class
+  can serve at most one climbing class.
+\item[(ii)] \emph{The exact growth rate} (Theorem~B): the non-asymptotic
+  sandwich
+  $\binom{k}{\ceil{\theta k}}/k \le c(k)\le (k+1)\binom{k}{\ceil{\theta k}}$,
+  $\theta=\log_3 2$, whence
+  $\gamma=\lim_k \tfrac1k\log_2 c(k) = H(\theta) = 0.9499555272\ldots$
+  The lower bound rests on an elementary rotation lemma of independent
+  interest.
+\item[(iii)] \emph{Fine structure} (Theorems~C--E): the climbing condition
+  factorizes over the Sturmian word of slope $\theta$; block transfer
+  matrices obey the standard-word recursion governed by the continued
+  fraction of $\log_2 3$; and the language of climbing words is not
+  regular, so the certificate frontier admits no finite-automaton
+  compression.
+\item[(iv)] \emph{Machine verification}: the core arithmetic lemma --- the
+  classes $-1 \bmod 2^m$ climb monotonically for $m-1$ steps with unit
+  $2$-adic valuations --- is verified in Lean~4 from the standard axioms
+  alone (Section~\ref{sec:artifacts}).
+\item[(v)] \emph{A verified computational artifact}: a depth-$20$
+  certificate system (4404 certificates, exact cover of $\N\setminus\{1\}$
+  up to the climbing classes, density $97.39\%$) checked by an independent
+  symbolic verifier.
+\item[(vi)] \emph{Local obstructions} (Theorems~F--G): no bounded
+  syndrome correction $\psi(n\bmod 2^d)$ makes $\log_2 n+\psi$ a one-step
+  Lyapunov function, and finite-window constraint hierarchies cannot
+  exclude climbing statistics, because the all-ones statistics are realized
+  by genuine integer orbit segments at every window length.
+\item[(vii)] \emph{A power-saving counterexample count}
+  (Corollary~\ref{cor:count}): unconditionally, the number of $n\le N$
+  whose orbit never descends below $n$ is at most $N^{H(\theta)+o(1)}$ ---
+  elementary counting gives exponent $1-\theta(1-H(\theta))=0.9684$, and
+  the effective irrationality measure of $\log_2 3$ improves it to the
+  certificate growth rate $H(\theta)=0.9500$ itself.
+\end{enumerate}
+
+We stress an explicit non-claim. The density exponent $1-H(\theta)$
+of the unresolved classes is classical: it is implicit in Terras's stopping
+time distribution \cite{Terras1976} and appears in the survey literature
+\cite{Lagarias1985,Korec1994,ApplegateLagarias1995}. What we claim as new is
+the \emph{proof-complexity} statement: the transfer of the count from one
+greedy tree to \emph{all} correct certificate systems (Theorem~A), the
+two-sided non-asymptotic constants and the elementary proof of the exact
+rate (Theorem~B), the Sturmian and automata-theoretic analysis of the
+frontier (Theorems~C--E), the machine-verified core, and the verified
+depth-$20$ artifact. In the language of proof complexity, Theorems~A--B are
+a lower bound for a natural, restricted proof system for the $3x+1$
+problem, in the spirit of lower bounds for resolution or bounded-depth
+systems, and they rigorously prune a region of the strategy space in which
+a large fraction of amateur and computer-assisted attempts operate.
+
+\emph{Related recent work.} The parity-vector viewpoint has seen recent
+activity close to our tools: Rozier and Terracol \cite{RozierTerracol2026}
+study the \emph{paradoxical} orbit segments (affine coefficient below one,
+yet no descent) which are exactly the exceptional integers of our collapse
+lemma; Niu \cite{Niu2026} enumerates paradoxical windows in closed form and
+observes their continued-fraction structure; and Fern\'andez and
+Ib\'a\~nez \cite{FernandezIbanez2026} prove that Christoffel words are
+extremal for a cycle functional. We indicate the points of contact as they
+arise (Remarks~\ref{rem:countnum} and \ref{rem:sturmrelated}); the
+proof-system lower bounds and the counting bound proved here do not appear
+in these works.
+
+The paper is organized as follows. Section~\ref{sec:prelim} fixes notation
+and proves the Terras bijection in the form we need.
+Section~\ref{sec:cert} defines certificates and systems.
+Section~\ref{sec:climb} proves the core lemmas, Section~\ref{sec:counting}
+the counting theorem, Section~\ref{sec:adaptive} its extension to
+disjunctive and adaptive systems, and Section~\ref{sec:rate} the exact
+growth rate.
+Section~\ref{sec:sturmian} develops the Sturmian structure,
+Section~\ref{sec:local} the local obstructions,
+Section~\ref{sec:artifacts} describes the verified artifacts, and
+Section~\ref{sec:discussion} delimits what is \emph{not} blocked by these
+results. An appendix reproduces, for completeness, the standard cycle
+bound in the form used here.
+
+\section{Preliminaries: the compressed map and parity vectors}\label{sec:prelim}
+
+Throughout, $T$ denotes the \emph{compressed} Collatz map on the positive
+integers,
+\[
+T(n)=\begin{cases} n/2, & n \text{ even},\\[2pt] (3n+1)/2, & n \text{ odd},\end{cases}
+\]
+introduced by Terras \cite{Terras1976}. For odd $n$ one has $C^2(n)=T(n)$,
+and since $3n+1>n$, the orbit of $n$ under $C$ descends below $n$ if and
+only if the orbit under $T$ does; all our statements therefore transfer to
+the standard map by this time change. We write
+$\theta=\log_3 2 = 0.6309297536\ldots$ and
+$H(x)=-x\log_2 x-(1-x)\log_2(1-x)$ for the binary entropy.
+
+For $n\ge 1$ and $j\ge 0$ let $b_j(n)=T^j(n)\bmod 2$ be the \emph{parity
+vector} of the orbit, and $e_j(n)=b_0(n)+\dots+b_{j-1}(n)$ the number of odd
+steps among the first $j$.
+
+\begin{lemma}[affine form and Terras bijection]\label{lem:terras}
+For every $k\ge 0$ and every residue $r$ mod $2^k$:
+\begin{enumerate}
+\item[(a)] the parities $b_0,\dots,b_{k-1}$ are constant on the class
+  $\{n\equiv r \pmod{2^k}\}$; write $e_j=e_j(r)$ for the resulting prefix
+  counts;
+\item[(b)] there are integers $\beta_j\ge 0$ ($0\le j\le k$), depending only
+  on $r$, with
+  \[
+  T^j(n)=\frac{3^{e_j} n+\beta_j}{2^j} \qquad (n\equiv r \bmod 2^k,\ 0\le j\le k),
+  \]
+  where $\beta_0=0$ and $\beta_{j+1}=3\beta_j+2^j$ if $b_j=1$,
+  $\beta_{j+1}=\beta_j$ if $b_j=0$; moreover $\beta_j\le 3^j$;
+\item[(c)] the map $r\mapsto (b_0,\dots,b_{k-1})$ is a bijection from
+  $\Z/2^k\Z$ onto $\{0,1\}^k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Induction on $k$, all three claims jointly. For $k=0$ there is nothing to
+prove. Assume the claims for $k$ and fix a class $r$ mod $2^k$, with affine
+form $T^k(n)=(3^{e_k}n+\beta_k)/2^k$. If $n$ and $n'=n+2^k$ are the two
+lifts of $r$ mod $2^{k+1}$, then
+$T^k(n')-T^k(n)=3^{e_k}\cdot 2^k/2^k=3^{e_k}$, which is odd. Hence
+$b_k$ is constant on each class mod $2^{k+1}$ and takes different values on
+the two lifts of each class mod $2^k$; this proves (a) and (c) at level
+$k+1$. For (b), if $b_k=0$ then $T^{k+1}(n)=T^k(n)/2=(3^{e_k}n+\beta_k)/2^{k+1}$;
+if $b_k=1$ then
+$T^{k+1}(n)=(3\,T^k(n)+1)/2=(3^{e_k+1}n+3\beta_k+2^k)/2^{k+1}$.
+The update rules and $\beta_{j+1}\le 3\beta_j+2^j\le 3\cdot 3^j$ give
+$\beta_j\le 3^j$ by induction.
+\end{proof}
+
+\section{Certificates and systems}\label{sec:cert}
+
+\begin{definition}[dyadic affine descent certificate]\label{def:cert}
+A \emph{certificate} is a tuple $(r,k,e,\beta,E)$ where $k\ge 1$, $r$ is a
+residue mod $2^k$ whose parity vector has $e=e_k(r)$ odd steps and affine
+constant $\beta=\beta_k(r)$ as in Lemma~\ref{lem:terras}, $E$ is a finite
+set, and the \emph{descent condition}
+\[
+T^k(n)<n \qquad\text{for all } n\in \mathcal{C},\qquad
+\mathcal{C}=\{n\ge 1: n\equiv r \bmod 2^k\}\setminus E ,
+\]
+holds. More generally we allow the certificate to be restricted to a class
+$\mathcal{C}'\subseteq\mathcal{C}$ defined by an additional congruence to an
+odd modulus. In all cases the \emph{dyadic atom} of the certificate is the
+class $r$ mod $2^k$ in which it lives, and $k$ is its \emph{dyadic depth}.
+
+A \emph{certificate system} $S$ is a finite or infinite family of
+certificates, together with a finite set $D$ of directly verified integers,
+such that the union of the certificate classes and $D$ covers
+$\N\setminus\{1,2\}$.
+\end{definition}
+
+A certificate system is exactly what is needed to run the folk proof: if
+every $n\ge 3$ lies in some certified class (or in $D$, whose orbits are
+checked to reach $1$ directly), strong induction on $n$ proves the
+conjecture, provided the exceptional sets are also checked. The point of
+this paper is that correct systems exist --- we exhibit a verified one in
+Section~\ref{sec:artifacts} --- but that all of them are infinite, with
+quantified depth inflation.
+
+\section{Climbing classes and the core lemmas}\label{sec:climb}
+
+\begin{definition}\label{def:climbing}
+A residue $r$ mod $2^k$ (equivalently, by Lemma~\ref{lem:terras}(c), its
+parity vector) is \emph{climbing} if $3^{e_j}>2^j$ for every
+$1\le j\le k$; equivalently $e_j>\theta j$ for all $j\le k$. Let $c(k)$
+denote the number of climbing residues mod $2^k$, and let
+$L\subseteq\{0,1\}^*$ be the language of climbing words.
+\end{definition}
+
+The first lemma shows that climbing classes exist in abundance --- indeed
+the class $-1$ mod $2^m$ climbs for $m-1$ full steps, realizing the
+extremal growth rate $(3/2)^{m-1}$.
+
+\begin{lemma}[climb lemma; machine-verified]\label{lem:climb}
+Let $m\ge 1$, $t\ge 1$ and $n=2^m t-1$. Define $n_j=3^j 2^{m-j}t-1$ for
+$0\le j\le m-1$, so $n_0=n$. Then for $0\le j\le m-2$: $n_j$ is odd,
+$T(n_j)=n_{j+1}$, and $n_{j+1}>n_j$. In particular the first $m-1$ steps of
+the orbit of $n$ are all odd steps, the orbit is strictly increasing along
+them, and $n_j\equiv -1 \pmod{2^{m-j}}$ for all $j\le m-1$.
+\end{lemma}
+
+\begin{proof}
+For $j\le m-1$ the number $3^j2^{m-j}t$ is even (as $m-j\ge 1$), so $n_j$
+is odd. For $j\le m-2$,
+\[
+T(n_j)=\frac{3n_j+1}{2}=\frac{3^{j+1}2^{m-j}t-2}{2}=3^{j+1}2^{m-j-1}t-1=n_{j+1},
+\]
+and $T(n)=(3n+1)/2>n$ holds for every positive $n$. The congruence is read
+off the formula. This lemma is machine-verified in Lean~4
+(Section~\ref{sec:artifacts}).
+\end{proof}
+
+\begin{corollary}\label{cor:cknonzero}
+For every $k\ge 1$ the class $-1$ mod $2^k$ is climbing; hence $c(k)\ge 1$.
+\end{corollary}
+
+\begin{proof}
+By Lemma~\ref{lem:climb} (with $m=k$), the values $n_0,\dots,n_{k-1}$ are
+all odd, so the parity vector of the class is all-ones: $e_j=j$ and
+$3^j>2^j$ for every $j\le k$.
+\end{proof}
+
+\begin{lemma}[climbing classes admit no certificate]\label{lem:nocert}
+If $3^e\ge 2^k$ and $\beta\ge 0$, then $(3^e n+\beta)/2^k<n$ holds for no
+$n\ge 1$. Consequently a certificate of depth $k$ (which certifies descent
+for all but finitely many $n$ in an infinite class) must have $3^{e_k}<2^k$,
+i.e.\ its dyadic atom is non-climbing at its own depth.
+\end{lemma}
+
+\begin{proof}
+$(3^e n+\beta)/2^k \ge n\cdot 3^e/2^k \ge n$.
+\end{proof}
+
+\begin{lemma}[prefix closedness and locality]\label{lem:locality}
+\begin{enumerate}
+\item[(a)] Climbing is prefix-closed: if $r$ mod $2^k$ is climbing and
+  $k'\le k$, then the reduction $r$ mod $2^{k'}$ is climbing.
+\item[(b)] A certificate of dyadic depth $k'\le k$ covers no element of any
+  climbing class mod $2^k$.
+\item[(c)] A certificate of dyadic depth $k''>k$ has its atom contained in
+  exactly one class mod $2^k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(a) is immediate from Definition~\ref{def:climbing}, since the conditions
+for $j\le k'$ are a subset of those for $j\le k$ and, by
+Lemma~\ref{lem:terras}, the parity prefix of the reduced class is the
+prefix of the parity vector. For (b): by Lemma~\ref{lem:nocert} the
+certificate's atom $r'$ mod $2^{k'}$ satisfies $3^{e_{k'}}<2^{k'}$, so it is
+not climbing at depth $k'$; but by (a) the reduction mod $2^{k'}$ of any
+climbing class mod $2^k$ \emph{is} climbing at depth $k'$; hence the two
+classes mod $2^{k'}$ are distinct and therefore disjoint. (c) is trivial.
+\end{proof}
+
+\section{The counting theorem}\label{sec:counting}
+
+\begin{thmA}
+Let $S$ be any correct certificate system. Then for every $k\ge 1$, $S$
+contains at least $c(k)$ certificates of dyadic depth exceeding $k$.
+In particular:
+\begin{enumerate}
+\item[(a)] no finite certificate system exists;
+\item[(b)] with Theorem~B below, the system $S$ contains at
+  least $2^{H(\theta)k-O(\log k)}$ certificates of depth $>k$, for every
+  $k$: the depth distribution of every correct system has exponentially
+  heavy tails at every scale.
+\end{enumerate}
+\end{thmA}
+
+\begin{proof}
+Fix $k$ and a climbing class $\mathcal{K}$ mod $2^k$. The class contains
+infinitely many integers and only finitely many lie in the directly
+verified set $D$, so some $n\in\mathcal{K}$ is covered by a certificate of
+$S$. By Lemma~\ref{lem:locality}(b), no certificate of depth $\le k$ covers
+any element of $\mathcal{K}$; hence that certificate has depth $>k$. By
+Lemma~\ref{lem:locality}(c), a certificate of depth $>k$ meets exactly one
+class mod $2^k$, so certificates assigned in this way to distinct climbing
+classes are distinct. There are $c(k)$ climbing classes, giving $c(k)$
+distinct certificates of depth $>k$. Claim (a) follows since $c(k)\ge 1$
+for all $k$ (Corollary~\ref{cor:cknonzero}) and a finite system has a
+maximal depth. Claim (b) follows from the lower bound in Theorem~B, since
+$k\,H(\ceil{\theta k}/k)=k\,H(\theta)+O(1)$ and
+$\binom{k}{e}\ge 2^{kH(e/k)}/(k+1)$.
+\end{proof}
+
+\begin{remark}
+The proof uses nothing about the internal structure of the certificates
+beyond Lemmas~\ref{lem:nocert} and \ref{lem:locality}; in particular it
+applies verbatim to systems mixing arbitrary depths, refining by odd
+moduli, and discarding arbitrary finite exceptional sets. Systems whose
+members certify descent for a \emph{disjunction} of congruence classes
+under an \emph{adaptive} stopping rule are not covered by the statement as
+given; Section~\ref{sec:adaptive} extends the bound to exactly that
+setting.
+\end{remark}
+
+\section{Robustness: disjunctions and adaptive stopping}\label{sec:adaptive}
+
+The folk strategy admits two natural liberalizations that
+Definition~\ref{def:cert} does not cover: a single certificate might claim
+descent for a \emph{union} of congruence classes, and it might allow the
+descent time to \emph{vary with $n$} instead of being the fixed depth of an
+affine identity. This section shows that neither liberalization, nor both
+together, weakens the counting bound: adaptive stopping collapses to a
+canonical stopping time on every congruence class, and each constituent
+class of a valid disjunction can serve at most one climbing class.
+
+\begin{definition}[adaptive disjunctive certificate]\label{def:adaptive}
+An \emph{adaptive disjunctive certificate} is a tuple $(U,K,E)$ where
+$U=C_1\cup\dots\cup C_w$ is a finite union of congruence classes
+$C_t=\{n\ge 1: n\equiv r_t \bmod 2^{d_t}q_t\}$ with $q_t$ odd
+(we call $d_t$ the \emph{dyadic depth} of the constituent $C_t$, and $w$
+the \emph{width}), $K\ge 1$ is the \emph{horizon}, $E$ is finite, and the
+claim
+\[
+\forall\, n\in U\setminus E\ \ \exists\, j\le K:\ T^j(n)<n
+\]
+is true. An \emph{adaptive system} is a countable family of such
+certificates, plus a finite directly verified set $D$, with
+$\bigcup_i (U_i\setminus E_i)\cup D\supseteq\N\setminus\{1,2\}$.
+Since every eventually periodic subset of $\N$ is, up to a finite set, a
+finite union of congruence classes, this notion covers every certificate
+whose scope is defined by congruence information of any modulus ---
+including odd moduli such as powers of~$3$.
+\end{definition}
+
+\begin{lemma}[adaptive collapse]\label{lem:collapse}
+Fix a class $r$ mod $2^K$ with prefix counts $e_j$
+(Lemma~\ref{lem:terras}) and let
+$j_1=\min\{j\le K: 3^{e_j}<2^j\}$ (with $j_1=\infty$ if the class is
+climbing at depth $K$). Then for every $n\equiv r \pmod{2^K}$:
+\begin{enumerate}
+\item[(a)] $T^j(n)>n$ for every $j\le K$ with $3^{e_j}>2^j$ --- with no
+  condition on $n$; this holds in particular for every $j<j_1$, and if
+  $j_1=\infty$ then no $n\ge 1$ in the class descends below itself within
+  $K$ steps;
+\item[(b)] if $j_1\le K$ and $n>3^{j_1}$ then $T^{j_1}(n)<n$.
+\end{enumerate}
+Consequently, for $n>3^K$ the events ``$T^j(n)<n$ for some $j\le K$'' and
+``$j_1\le K$'' coincide, and the first descent time equals $j_1$ exactly:
+on every congruence class, an adaptive stopping time collapses to the
+canonical first-descent time. (This is the elementary, horizon-bounded
+direction of Terras's coefficient stopping time analysis
+\cite{Terras1976}.)
+\end{lemma}
+
+\begin{proof}
+(a) $T^j(n)=(3^{e_j}n+\beta_j)/2^j\ge 3^{e_j}n/2^j>n$ whenever
+$3^{e_j}>2^j$, with no condition on $n$; for $j<j_1$ this inequality holds
+by minimality of $j_1$. (b) Descent at $j_1$ is
+$n(2^{j_1}-3^{e_{j_1}})>\beta_{j_1}$; the left side is $\ge n$ (the bracket
+is a positive integer) and $\beta_{j_1}\le 3^{j_1}$ by
+Lemma~\ref{lem:terras}(b). The consequence follows since steps $j<j_1$
+never descend by (a) and step $j_1$ descends by (b).
+\end{proof}
+
+\begin{lemma}[persistence of climbing]\label{lem:persist}
+If $r$ mod $2^k$ is climbing, its extension appending the parity $1$ is a
+climbing class mod $2^{k+1}$. Hence $c(k+1)\ge c(k)$; every climbing class
+mod $2^k$ contains a climbing class mod $2^K$ for every $K\ge k$; and the
+intersection of a climbing class with any congruence class to an odd
+modulus is infinite.
+\end{lemma}
+
+\begin{proof}
+Prefix conditions up to $k$ are unchanged, and at $k+1$:
+$3^{e_k+1}=3\cdot 3^{e_k}>3\cdot 2^k>2^{k+1}$. Iterating gives the second
+claim; the third is the Chinese remainder theorem.
+\end{proof}
+
+\begin{thmAp}
+Let $S$ be any correct adaptive system. Then:
+\begin{enumerate}
+\item[(a)] every constituent class of every certificate of $S$ is
+  non-climbing at its own dyadic depth;
+\item[(b)] for every $k\ge 1$, at least $c(k)$ constituent classes across
+  $S$ have dyadic depth exceeding $k$, and every certificate covering an
+  element of a climbing class mod $2^k$ has horizon exceeding $k$. If
+  every certificate of $S$ has width at most $w$, then $S$ contains at
+  least $c(k)/w$ certificates whose horizon and dyadic depth exceed $k$;
+\item[(c)] (packaging invariance) for every valid $(U,K,E)$,
+  \[
+  U\setminus\bigl(E\cup[1,3^K]\bigr)\ \subseteq\ D(K):=
+  \bigcup\{\,\text{classes mod } 2^K \text{ with } j_1\le K\,\},
+  \]
+  and conversely $D(K)$ is covered by the canonical uniform tree of
+  first-descent certificates of depth $\le K$ with exceptions in
+  $[1,3^K]$. Every adaptive disjunctive system is therefore, up to finite
+  sets, a repackaging of the canonical first-descent tree.
+\end{enumerate}
+\end{thmAp}
+
+\begin{proof}
+(a) Suppose the constituent $C_t$ (dyadic depth $d$, odd modulus $q_t$,
+inside a certificate of horizon $K$) is climbing at depth $d$. By
+Lemma~\ref{lem:persist} there is a climbing class mod $2^{\max(d,K)}$
+inside its dyadic class, and its intersection with the congruence
+condition mod $q_t$ is infinite; every $n$ in that intersection satisfies
+$T^j(n)>n$ for all $j\le K$ by Lemma~\ref{lem:collapse}(a). All but
+finitely many of these $n$ avoid $E$, so the certificate's claim is false.
+
+(b) Fix a climbing class $\mathcal{K}$ mod $2^k$ and pick
+$n\in\mathcal{K}\setminus D$ covered by some certificate, say
+$n\in C_t\setminus E$. By (a) the class $C_t$ has a first non-climbing
+prefix $j_1\le d_t$. Since $n\in\mathcal{K}$, the parity prefix of $n$ is
+climbing at every depth $\le k$; since $n\in C_t$, its prefix at depth
+$j_1$ is that of $C_t$, which is non-climbing. Hence $j_1>k$, so
+$d_t\ge j_1>k$, and the dyadic class of $C_t$ reduces mod $2^k$ to the
+single class $\mathcal{K}$. Distinct climbing classes therefore meet
+distinct constituent classes, giving at least $c(k)$ constituents of
+dyadic depth $>k$. For the horizon: the prefixes of $n$ at depths
+$\le k$ are climbing, so $T^j(n)>n$ for all $j\le k$
+(Lemma~\ref{lem:collapse}(a)), and the certified descent time of $n$
+exceeds $k$; hence $K>k$. The width bound is immediate.
+
+(c) For $n\in U\setminus E$ with $n>3^K$, the claim provides a descent
+within $K$ steps, and Lemma~\ref{lem:collapse} shows this forces
+$j_1(n\bmod 2^K)\le K$, i.e.\ $n\in D(K)$. Conversely each class mod
+$2^K$ with $j_1\le K$ is certified by the affine certificate of depth
+$j_1$ at its first-descent prefix, whose exceptional set is contained in
+$[1,3^{j_1}]$ by Lemma~\ref{lem:collapse}(b).
+\end{proof}
+
+\begin{remark}[numerical verification]\label{rem:adaptivenum}
+The collapse of Lemma~\ref{lem:collapse} was checked exhaustively for all
+$2\le n\le 2^{20}$ at horizon $K=12$ (no violations; in this range no
+exceptional stragglers below the $3^{j_1}$ bound occurred at all), the
+monotonicity $c(k+1)\ge c(k)$ was confirmed to $k=20$ with the anchor
+$c(20)=27328$ of Section~\ref{sec:artifacts}, and invalidity witnesses for
+climbing constituents with odd moduli $q\in\{5,7,11\}$ were confirmed at
+horizons up to $80$.
+\end{remark}
+
+The collapse lemma has a further unconditional consequence: a power-saving
+upper bound on the number of potential counterexamples to the conjecture
+itself.
+
+\begin{corollary}[counting potential counterexamples]\label{cor:count}
+Let $\mathcal{E}=\{n>1:\ T^j(n)\ge n \text{ for all } j\ge 1\}$, the set of
+integers whose orbit never descends below its starting point. (The least
+element of any divergent orbit and of any nontrivial cycle lies in
+$\mathcal{E}$, and the conjecture is equivalent to
+$\mathcal{E}=\emptyset$.) Then:
+\begin{enumerate}
+\item[(a)] elementarily,
+  $|\mathcal{E}\cap[1,N]|\le C(\log_2 N)^2\,N^{\,1-\theta(1-H(\theta))}$,
+  with $1-\theta(1-H(\theta))=0.968426\ldots$;
+\item[(b)] using the effective irrationality measure
+  $|j\log 2-e\log 3|>c\,j^{-13.3}$ of Rhin \cite{Rhin1987}, for effectively
+  large $N$,
+  \[
+  |\mathcal{E}\cap[1,N]|\ \le\ (\log_2 N)\, c\bigl(\lfloor\log_2 N\rfloor\bigr)
+  \ =\ N^{\,H(\theta)+o(1)}\ =\ N^{\,0.94996\ldots} :
+  \]
+  the counting exponent equals the certificate growth rate $\gamma$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(a) Let $n\in\mathcal{E}\cap(M,2M]$ with $M=2^m$ and set
+$j=\floor{\log_3 M}$, so $n>3^j$. By Lemma~\ref{lem:collapse} the class of
+$n$ mod $2^j$ is climbing. There are $c(j)$ such classes, each meeting
+$(M,2M]$ in exactly $2^{m-j}$ integers, so
+$|\mathcal{E}\cap(M,2M]|\le c(j)2^{m-j}\le (j+1)2^{jH(\theta)}2^{m-j}$ by
+Theorem~B; since $j=\floor{\theta m}$, this is
+$\le (m+1)\,2M\cdot M^{-\theta(1-H(\theta))}$, and summing over dyadic
+blocks gives (a).
+
+(b) Suppose $n\in(M,2M]$ has its first non-climbing prefix at depth
+$j_1\le m$. Failure of descent at $j_1$ requires
+$n(2^{j_1}-3^{e_{j_1}})\le\beta_{j_1}\le 3^{j_1}$. If
+$3^{e_{j_1}}\le 2^{j_1-1}$ the gap is at least $2^{j_1-1}$; otherwise
+$2^{j_1}-3^{e_{j_1}}=3^{e_{j_1}}(e^{\Lambda}-1)\ge 2^{j_1-1}\Lambda$ with
+$\Lambda=j_1\ln 2-e_{j_1}\ln 3\ge c\,j_1^{-13.3}$ \cite{Rhin1987}. Either
+way $n\le 2(3/2)^{j_1}j_1^{13.3}/c$, which is smaller than $2^m<n$ for
+every $j_1\le m$ once $m\ge m_0(c)$, effectively. Hence every
+$n\in\mathcal{E}\cap(M,2M]$ is climbing at depth $m$; each residue mod
+$2^m$ occurs exactly once in $(M,2M]$, so
+$|\mathcal{E}\cap(M,2M]|\le c(m)$. Summing over dyadic blocks, using that
+$c$ is non-decreasing (Lemma~\ref{lem:persist}), gives (b).
+\end{proof}
+
+\begin{remark}\label{rem:countnum}
+(i) The exceptional integers in the proof of (b) --- a non-climbing prefix
+at depth $j_1$, yet no descent there --- are precisely the initial terms
+of the \emph{paradoxical sequences} of Rozier--Terracol
+\cite{RozierTerracol2026} (with the window ending at the first
+non-climbing depth, where the affine coefficient first drops below one).
+Their remainder bound \cite[Thm.~2.4]{RozierTerracol2026},
+$\beta_j/2^j\le(3^{q}-2^{q})/2^{q}$ with $q=e_j$, sharpens the envelope of
+the margin bound $B(j):=\max\beta_j/(2^j-3^{e_j})$ from
+$(3/2)^jj^{13.3}$ to $(3/2)^{\theta j}j^{13.3}$ (up to constants), since
+$q<\theta j$ at a non-climbing depth; and their Theorem~1.3 shows no such
+integer exists in $(4614,\,2.8\times 10^{19})$. Numerically $B(j)\le 24$
+for all $j\le 24$, with spikes exactly at the best rational approximations
+of $\log_2 3$ (e.g.\ the Pythagorean-comma depth, $2^8/3^5$) --- the same
+continued-fraction structure observed for paradoxical ratios in
+\cite{Niu2026}. (ii) The recent literature enumerates paradoxical
+\emph{windows} \cite{Niu2026} and shows that finiteness of the set of
+paradoxical sequences implies the conjecture
+\cite[Cor.~3.3]{RozierTerracol2026}; a power-saving count of the
+non-descending set $\mathcal{E}$ itself does not appear there, nor
+anywhere else we could locate. Both bounds are routine consequences of the
+present framework (and, for (b), of \cite{Rhin1987}), and we state them
+with that caveat. (iii) The shadow method is exhausted at the exponent $H(\theta)$:
+the set of integers in $(M,2M]$ satisfying all depth-$m$ congruence
+necessary conditions has exactly $c(m)$ elements, so no argument using
+congruence shadows alone can lower the exponent further. Pushing the
+forced-climbing depth to its true limit $\log_{3/2}n$ would require
+counting climbing residues that are \emph{small as integers} ---
+information not contained in shadows (heuristically that limit exponent is
+$1-(1-H(\theta))/\log_2(3/2)=0.91445\ldots$). (iv) Thematically, (b) ties
+the two halves of the problem together: the counterexample count is
+governed by the certificate entropy, and the enhancement input is the same
+linear-forms data that governs the cycle bound of
+Appendix~\ref{app:cycle}.
+\end{remark}
+
+\begin{remark}[what robustness does and does not say]\label{rem:adaptivescope}
+Theorem~A$'$ closes every liberalization of the folk strategy whose
+certificate scopes are eventually periodic sets --- in particular,
+partitioning by residues modulo powers of $3$, or any mixed modulus, buys
+nothing, and neither does any orbit-adaptive stopping rule. What remains
+outside its quantification are certificates whose scopes are \emph{not}
+unions of congruence classes: sets defined by inequalities on orbit
+values, by unbounded-window parity information, or by genuinely analytic
+(ensemble) data. Section~\ref{sec:discussion} discusses these exits.
+\end{remark}
+
+\section{The exact growth rate}\label{sec:rate}
+
+\begin{lemma}[rotation lemma]\label{lem:rotation}
+Let $b=(b_1,\dots,b_k)\in\{0,1\}^k$ with $e=\sum_i b_i$ and $e-\theta k>0$.
+Then some cyclic rotation of $b$ is climbing, i.e.\ has all prefix sums
+$e_j-\theta j$ positive.
+\end{lemma}
+
+\begin{proof}
+Set $w_i=b_i-\theta$ and $S_j=w_1+\dots+w_j$, $S_0=0$, so
+$S_k=e-\theta k>0$. Since $\theta$ is irrational, the values
+$S_0,\dots,S_{k-1}$ are pairwise distinct (an equality $S_a=S_b$ with
+$a<b$ would make $\theta=(e_b-e_a)/(b-a)$ rational). Let $j^*$ be the
+unique index in $\{0,\dots,k-1\}$ at which $\min_{0\le j\le k-1}S_j$ is
+attained, and consider the rotation
+$b'=(b_{j^*+1},\dots,b_k,b_1,\dots,b_{j^*})$. Its prefix sums are
+\[
+S'_i=S_{j^*+i}-S_{j^*}\quad (1\le i\le k-j^*),\qquad
+S'_{k-j^*+i}=S_k-S_{j^*}+S_i \quad (1\le i\le j^*).
+\]
+The first group is positive because $S_{j^*}$ is the strict minimum among
+$S_0,\dots,S_{k-1}$ and $S_k>S_0\ge S_{j^*}$; the second group is positive
+because $S_i\ge S_{j^*}$ and $S_k>0$. Hence all prefix sums of $b'$ are
+positive, which is the climbing condition.
+\end{proof}
+
+\begin{thmB}
+For every $k\ge 1$, with $\theta=\log_3 2$,
+\[
+\frac1k\binom{k}{\ceil{\theta k}} \;\le\; c(k)\;\le\;(k+1)\binom{k}{\ceil{\theta k}} .
+\]
+Consequently $\gamma:=\lim_{k\to\infty}\frac1k\log_2 c(k)$ exists and
+\[
+\gamma=H(\theta)=H(\log_3 2)=0.9499555272\ldots
+\]
+Moreover $c$ is supermultiplicative, $c(k_1+k_2)\ge c(k_1)c(k_2)$, so the
+limit also equals $\sup_k \frac1k \log_2 c(k)$.
+\end{thmB}
+
+\begin{proof}
+\emph{Lower bound.} Let $e=\ceil{\theta k}$, so $e-\theta k>0$ ($\theta k$
+is irrational). Partition the $\binom{k}{e}$ words with $e$ ones into
+classes under cyclic rotation; each class has at most $k$ elements, and by
+Lemma~\ref{lem:rotation} each class contains at least one climbing word.
+By Lemma~\ref{lem:terras}(c) every word is the parity vector of exactly one
+residue, so $c(k)\ge \binom{k}{e}/k$.
+
+\emph{Upper bound.} A climbing word satisfies $e_k>\theta k$, so
+$e_k\ge\ceil{\theta k}$. Since $\theta>1/2$, the binomial coefficients
+$\binom{k}{e}$ are non-increasing for $e\ge\ceil{\theta k}\ge k/2$, whence
+\[
+c(k)\le \sum_{e\ge \ceil{\theta k}}\binom{k}{e}
+\le (k+1-\ceil{\theta k})\binom{k}{\ceil{\theta k}}\le (k+1)\binom{k}{\ceil{\theta k}}.
+\]
+
+\emph{Supermultiplicativity.} If $u$ is climbing of length $k_1$ and $v$
+climbing of length $k_2$, then the concatenation $uv$ is climbing: for
+$j\le k_1$ the prefix sums are those of $u$; for $j=k_1+i$ they equal
+$S^u_{k_1}+S^v_i>0$. Distinct pairs give distinct concatenations, so
+$c(k_1+k_2)\ge c(k_1)c(k_2)$. Fekete's lemma applied to the superadditive
+sequence $\log_2 c(k)$ (finite since $c(k)\le 2^k$, and $c(k)\ge 1$ by
+Corollary~\ref{cor:cknonzero}) yields
+$\lim_k \frac1k\log_2 c(k)=\sup_k\frac1k\log_2 c(k)$.
+
+\emph{The value.} By Stirling,
+$\frac1k\log_2\binom{k}{\ceil{\theta k}}\to H(\theta)$, and the polynomial
+factors $1/k$, $(k+1)$ do not affect the limit.
+\end{proof}
+
+\begin{remark}[numerical verification]\label{rem:numB}
+The sandwich was verified computationally for all $k\le 1600$ against exact
+values of $c(k)$ computed by dynamic programming over the walk of
+Theorem~C, and the climbing condition was checked against exhaustive
+enumeration of all $2^k$ words for $k\le 16$. The fluctuation
+$\tilde b(k)=\log_2 c(k)-\log_2\binom{k}{\ceil{\theta k}}$ stays within the
+proven window $[-\log_2 k,\ \log_2(k+1)]$ throughout.
+\end{remark}
+
+\begin{corollary}[density; classical in content]\label{cor:density}
+The natural density of the union of climbing classes at depth $k$ is
+$c(k)/2^k=2^{-(1-H(\theta))k+o(k)}$, with $1-H(\theta)=0.0500444728\ldots$;
+equivalently, the greedy certificate tree of depth $k$ certifies descent on
+a set of density $1-c(k)/2^k\to 1$. This recovers, in certificate form, the
+density theorems of Terras and Everett
+\cite{Terras1976,Everett1977,Korec1994}.
+\end{corollary}
+
+\section{Sturmian structure of the frontier}\label{sec:sturmian}
+
+For $j\ge 1$ let
+\[
+\sigma_j=\floor{(j+1)\theta}-\floor{j\theta}\in\{0,1\}
+\]
+be the $j$-th letter of the \emph{characteristic Sturmian word} of slope
+$\theta$ \cite[Ch.~2]{Lothaire2002}.
+
+\begin{thmC}
+For a word $(b_1,\dots,b_k)$ define the \emph{excess walk}
+$d_j=e_j-\floor{\theta j}-1$. Then the word is climbing if and only if
+$d_j\ge 0$ for all $1\le j\le k$, and the walk updates by
+\[
+d_{j+1}-d_j=b_{j+1}-\sigma_j\in
+\begin{cases}
+\{0,+1\}, & \sigma_j=0,\\
+\{-1,0\}, & \sigma_j=1 .
+\end{cases}
+\]
+Hence $c(k)$ equals the number of non-negative paths of the
+$\sigma$-driven walk started from the forced first step $b_1=1$
+(i.e.\ $d_1=0$).
+\end{thmC}
+
+\begin{proof}
+Since $\theta j$ is irrational for $j \geq 1$, $e_j>\theta j$ is equivalent to
+$e_j\ge\floor{\theta j}+1$, i.e.\ $d_j\ge 0$. The update is immediate from
+$e_{j+1}=e_j+b_{j+1}$ and the definition of $\sigma_j$. At $j=1$:
+$\floor{\theta}=0$, so $d_1=b_1-1\ge 0$ forces $b_1=1$.
+\end{proof}
+
+For the block structure, write the continued fraction
+$\theta=[0;a_1,a_2,a_3,\dots]=[0;1,1,1,2,2,3,1,5,2,\dots]$ and let
+$s_0=0$, $s_1=1$, $s_{n+1}=s_n^{\,a_{n+1}}s_{n-1}$ be the associated
+standard words; their lengths are the continued-fraction denominators
+$q_n=1,1,2,3,8,19,65,84,485,1054,\dots$ of $\theta$, and the
+characteristic word $\sigma$ is their limit \cite[Ch.~2]{Lothaire2002}.
+Encode the two letter steps of Theorem~C as infinite $0$--$1$ transfer
+matrices acting on the state $d\in\{0,1,2,\dots\}$, in the row-vector
+convention:
+\[
+M(0)_{d,d'}=[d'=d]+[d'=d+1],\qquad
+M(1)_{d,d'}=[d'=d-1]_{d\ge1}+[d'=d] .
+\]
+Products of $k$ such matrices are banded (bandwidth $\le k$), so all
+entries below are finite sums.
+
+\begin{thmD}
+Let $B_n=M(\sigma\text{-letters of } s_n)$ be the ordered product of letter
+matrices along the standard word $s_n$ (row-vector convention: products
+compose in word order). Then
+\[
+B_{n+1}=B_n^{\,a_{n+1}}B_{n-1}\qquad (n\ge 1),
+\]
+and for every $k$,
+\[
+c(k)=\Bigl(e_0^{\top} \,M(\sigma_1)M(\sigma_2)\cdots M(\sigma_{k-1})\Bigr)\mathbf 1 ,
+\]
+where $e_0$ is the coordinate vector of the state $d=0$.
+\end{thmD}
+
+\begin{proof}
+The map assigning to a finite word the ordered product of its letter
+matrices is a monoid morphism (in the row-vector convention, concatenation
+maps to product in the same order), so the matrix recursion is the image of
+the standard-word recursion $s_{n+1}=s_n^{\,a_{n+1}}s_{n-1}$. The formula
+for $c(k)$ is Theorem~C: the matrix entry
+$(M(\sigma_1)\cdots M(\sigma_{k-1}))_{0,d}$ counts the walks from $d_1=0$
+to $d_k=d$ that stay non-negative, and summing over $d$ counts all
+climbing words.
+\end{proof}
+
+\begin{remark}[numerics]\label{rem:sturmnum}
+The identification of $\sigma$ with the limit of the standard words was
+checked letter-by-letter to length $1054$ $(=q_9)$; the matrix recursion
+was verified exactly on truncation-exact corners and modulo the prime
+$3000017$ for $n\le 6$; and the matrix-product formula for $c(k)$ was
+checked against the direct dynamic program for $k\le 200$. A two-letter
+statistic captures most of the fluctuation of $\log_2 c(k)$ around
+$H(\theta)k$: empirically
+$\mathbb{E}[\Delta\varphi\mid\sigma=0]=+0.05004\approx 1-H(\theta)$ and
+$\mathbb{E}[\Delta\varphi\mid\sigma=1]=-0.03022$ explain $82\%$ of the
+variance, rising to $97.6\%$ at the level of derived-word blocks --- the
+fluctuation of the certificate count is governed by the first two levels of
+the continued-fraction hierarchy of $\log_2 3$.
+\end{remark}
+
+\begin{thmE}
+The language $L$ of climbing words is not regular. More precisely, for
+$a,b\ge 1$,
+\[
+1^a0^b\in L \iff b\le \Bigl\lceil a\,\tfrac{1-\theta}{\theta}\Bigr\rceil-1 ,
+\]
+and since the right-hand side is unbounded in $a$, the Myhill--Nerode
+equivalence has infinitely many classes.
+\end{thmE}
+
+\begin{proof}
+For the word $1^a0^b$ the prefix sums are $e_j-\theta j=j(1-\theta)>0$ for
+$j\le a$, and $e_{a+i}-\theta(a+i)=a-\theta(a+i)$ for $1\le i\le b$, which
+is positive iff $i<a(1-\theta)/\theta$; as $\theta$ is irrational, equality
+is impossible, so the condition on $b$ is
+$b\le\ceil{a(1-\theta)/\theta}-1$. Write $\phi(a)$ for this bound; $\phi$
+is unbounded. If $a\ne a'$ with $\phi(a)<\phi(a')$, the word $0^{\phi(a')}$
+separates $1^{a}$ from $1^{a'}$; hence infinitely many Myhill--Nerode
+classes, and $L$ is not regular.
+\end{proof}
+
+\begin{remark}[related work]\label{rem:sturmrelated}
+Balanced-word structures have independently surfaced on the cycle side of
+the problem: Fern\'andez--Ib\'a\~nez \cite{FernandezIbanez2026} prove that
+Christoffel words --- the finite relatives of standard Sturmian words ---
+are, up to rotation, the unique maximizers of a cycle functional on binary
+words of fixed length and weight, yielding bounds on the minimum element
+of a hypothetical cycle. Their extremal role there and the driving role of
+the characteristic Sturmian word here (Theorems~C--D) are distinct
+phenomena with a common source: the affine functional $3^{e}/2^{j}$ is
+extremized under balance constraints governed by the continued fraction of
+$\log_2 3$.
+\end{remark}
+
+\begin{conjecture}\label{conj:precursive}
+The sequence $c(k)$ is not P-recursive (holonomic). (Supporting evidence: an
+exhaustive search found no polynomial-coefficient recurrence of order
+$\le 6$ and degree $\le 6$, with the kernel computations confirmed modulo
+three independent primes; and the Sturmian driving of Theorem~C ties the
+fine structure of $c(k)$ to the continued fraction of $\log_2 3$, which is
+not eventually periodic as far as it has been computed.)
+\end{conjecture}
+
+\section{Local obstructions}\label{sec:local}
+
+The counting theorem bounds one specific proof system. It is natural to ask
+whether small modifications escape it: a bounded ``syndrome correction'' to
+the potential $\log_2 n$, or a hierarchy of finite-window constraints meant
+to exclude the climbing statistics. The following two results close the
+bounded-memory variants of both ideas; their scope limitations are stated
+explicitly and discussed in Section~\ref{sec:discussion}.
+
+\begin{thmF}
+Let $d\ge 1$, $\psi:\Z/2^d\Z\to\R$, $\varepsilon>0$, and set
+$\varphi(n)=\log_2 n+\psi(n\bmod 2^d)$. Then the one-step descent property
+\[
+\varphi(T(n))\le\varphi(n)-\varepsilon\qquad\text{for all } n>1
+\]
+fails. In fact it fails on the single class $n\equiv -1 \pmod{2^{d+1}}$:
+there the syndrome is a fixed point and the step is expanding.
+\end{thmF}
+
+\begin{proof}
+Let $n=2^{d+1}t-1$, $t\ge 1$. Then $n$ is odd, $n\equiv -1\pmod{2^d}$, and
+by Lemma~\ref{lem:climb} (with $m=d+1$) $T(n)=3\cdot 2^{d}t-1\equiv -1
+\pmod{2^d}$. Hence $\psi(T(n)\bmod 2^d)=\psi(n\bmod 2^d)$ and
+\[
+\varphi(T(n))-\varphi(n)=\log_2\frac{3n+1}{2n}>\log_2\frac32>0 ,
+\]
+contradicting descent by any $\varepsilon>0$.
+\end{proof}
+
+\begin{remark}[robustness of the obstruction]\label{rem:simplex}
+Theorem~F is stated for the all-ones syndrome because one class suffices,
+but the obstruction is much fatter: in the natural linear-programming
+relaxation over the syndrome transition graph, every shift-invariant
+measure on parity sequences with odd-step frequency $\rho>\theta$ has
+positive drift $\rho\log_2 3-1>0$, and these measures form a non-empty
+compact convex set. Any per-step, bounded-memory dyadic correction thus
+fails robustly, not by a degenerate coincidence. By contrast, deleting the
+states with two trailing ones makes the maximum mean cycle negative: an
+explicit finite Lyapunov function exists for orbits that never visit
+$n\equiv 3\pmod 4$; compare Corollary~\ref{cor:freq}.
+\end{remark}
+
+\begin{thmG}
+Fix a window length $w\ge 1$ and a syndrome depth $d\ge 1$. There exist
+infinitely many $n$ (namely all $n=2^{w+d+1}t-1$, $t\ge 1$) whose first $w$
+compressed steps form a strictly increasing orbit segment with all steps
+odd, unit $2$-adic valuations ($v_2(3n_j+1)=1$), and constant all-ones
+syndrome $n_j\equiv -1 \pmod{2^d}$ for $0\le j\le w$. Consequently, any
+family of constraints on length-$w$ windows of (parities, valuations,
+depth-$d$ syndromes) that is valid for all non-descending integer orbit
+segments is satisfied by the all-ones statistics: finite-window constraint
+hierarchies cannot exclude climbing statistics.
+\end{thmG}
+
+\begin{proof}
+Apply Lemma~\ref{lem:climb} with $m=w+d+1$: for $j\le w$ the values
+$n_j=3^j2^{m-j}t-1$ satisfy $n_j\equiv -1\pmod{2^{m-j}}$ and $m-j\ge d+1$,
+so all listed statistics of the window coincide with those of the all-ones
+cylinder, while the segment is a genuine orbit of a positive integer and is
+strictly increasing (hence non-descending).
+\end{proof}
+
+\begin{remark}[scope]\label{rem:scopeG}
+Theorem~G is a $\forall w\,\exists n$ statement: for each window length
+some integer realizes the climbing statistics. It does not produce a single
+$n$ realizing them for all $w$ (that would be a divergent orbit). Its force
+is contrapositive: any proof method whose reach is exhausted by constraints
+on bounded windows of bounded-depth dyadic data cannot prove the
+conjecture, since such constraints hold equally in the $2$-adic completion,
+where the all-ones orbit $(-1\mapsto -1)$ exists. Local statistics see only
+$\Z_2$, not $\N$.
+\end{remark}
+
+\begin{corollary}[forced visits to $3 \bmod 4$]\label{cor:freq}
+If $n>3^k$ and $T^j(n)\ge n$ for all $j\le k$, then the orbit segment
+visits $\{m\equiv 3 \pmod 4\}$ at least $(2\theta-1)k-1$ times among
+$j=0,\dots,k-1$; the frequency is at least
+$2\theta-1-O(1/k)$, with $2\theta-1=0.2618595\ldots$
+\end{corollary}
+
+\begin{proof}
+Non-descent through depth $k$ forces the climbing condition $e_j>\theta j$
+for all $j\le k$: if some prefix had $3^{e_j}<2^j$, then by
+Lemma~\ref{lem:terras}(b) descent $T^j(n)<n$ would hold whenever
+$n(2^j-3^{e_j})>\beta_j$, which is guaranteed by $n>3^k\ge\beta_j$
+since $2^j-3^{e_j}\ge 1$. An odd $m$
+has $T(m)$ odd iff $3m+1\equiv 2\pmod 4$ iff $m\equiv 3\pmod 4$. Thus
+visits to $3\bmod 4$ within the window are exactly the adjacent pairs
+$b_j=b_{j+1}=1$. A binary word of length $k$ with $e$ ones has at least
+$e-(k-e+1)=2e-k-1$ such pairs (the ones form at most $k-e+1$ blocks). With
+$e\ge\theta k$ this gives $(2\theta-1)k-1$.
+\end{proof}
+
+\section{Verified computational artifacts}\label{sec:artifacts}
+
+\subsection{The depth-20 certificate system}
+A greedy certificate tree of dyadic depth $20$ was generated and
+independently verified. It consists of $4404$ certificates whose atoms,
+together with the $c(20)=27328$ climbing classes mod $2^{20}$, form an
+exact partition of $\Z/2^{20}\Z$; the certified classes have natural
+density $1-27328/2^{20}=97.39\%$, and the single exceptional integer across
+the entire system is $n=1$ (the endpoint of the trivial cycle, for which
+descent is not required). Each certificate is stored as the full tuple
+$(k,\ \mathrm{mod},\ r,\ e,\ \beta,\ \text{exceptions})$ in a JSON artifact.
+
+The verifier is deliberately independent of the generator: it re-derives
+the parity vectors and affine data symbolically from scratch
+(Lemma~\ref{lem:terras}), checks exact cover and disjointness of the atoms,
+re-checks the descent inequality $n(2^k-3^e)>\beta$ at the minimal element
+of each class (which suffices for the whole class by monotonicity of the
+affine form), and confirms the climbing condition for each unresolved
+class. All arithmetic is exact (arbitrary-precision integers).
+
+\subsection{Machine verification of the core lemma}
+Lemma~\ref{lem:climb} is verified in Lean~4 as four theorems
+(\texttt{climb}, \texttt{climb\_mod}, \texttt{climb\_ge}, \texttt{barrier})
+in the artifact \texttt{Barrier.lean}, compiled with core Lean only (no
+external libraries), toolchain pinned to
+\texttt{leanprover/lean4:v4.32.2}. \texttt{\#print axioms} reports exactly
+\texttt{[propext, Quot.sound]}, the standard kernel axioms, and no
+\texttt{sorry}. We emphasize that the machine verification covers this core
+lemma only; the counting and rate theorems are verified by conventional
+proof plus the independent computations described above.
+
+\subsection{Reproducibility and data availability}
+All computations use exact integer (or exact rational) arithmetic. The
+supplementary bundle contains the certificate artifact, the Lean file with
+its pinned toolchain, the independent verifier, and one self-contained
+script per computational claim of this paper, each printing the quantity it
+certifies; a README lists the exact commands and expected outputs. SHA-256
+hashes of the frozen artifacts:
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+artifact & SHA-256\\
+\midrule
+\texttt{certificates.json} & \texttt{d32a24e4b34eb33a0aa8f01406354ae2}\\[-2pt]
+ & \texttt{2ddd65a7329b3d3309197150ad3d78fc}\\
+\texttt{Barrier.lean} & \texttt{c416508cda41b0df105bae91801d70c3}\\[-2pt]
+ & \texttt{7a3e2f65c0251bae1c90683492f4ec7d}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Discussion: what is and is not blocked}\label{sec:discussion}
+
+Theorems~A and A$'$ block the descent-certificate strategy in full
+generality --- any mixture of depths, congruence scopes of arbitrary
+moduli, disjunctions, adaptive stopping, and finite exceptions --- and
+Theorems~F--G block its bounded-memory Lyapunov and finite-window
+relaxations. It is equally important to state what is \emph{not} blocked.
+
+\emph{Congruence information is exhausted.} By Theorem~A$'$, no
+repackaging of congruence conditions on the starting point --- dyadic,
+$3$-adic, or mixed --- escapes the count: the certificate frontier is
+canonical, and its cost $2^{H(\theta)k}$ is invariant. A proof of the
+conjecture by descent certificates would need scopes that are not
+eventually periodic sets: sets defined by inequalities on orbit values, or
+by information of unbounded window length. The same collapse yields
+Corollary~\ref{cor:count} --- unconditionally at most $N^{0.950}$
+potential counterexamples up to $N$ --- and, since the congruence
+necessary conditions are attained exactly, improving that exponent
+requires non-shadow information.
+
+\emph{Unbounded memory and Lyapunov potentials.} Theorem~F excludes only
+per-step, bounded-memory dyadic corrections, and Theorem~A$'$ closes
+variable stopping for the potential $\log_2 n$ itself. Lyapunov schemes
+with unbounded memory, or with potentials other than $\log_2 n$ certified
+at variable times, are untouched --- though we note that the certificate
+tree itself is such an unbounded-memory object, and Theorem~A prices it at
+$2^{H(\theta)k}$ certificates per depth $k$.
+
+\emph{Non-dyadic information along the orbit.} Theorems~F--G are
+$2$-adic, and Theorem~A$'$ blocks $3$-adic conditions only as congruence
+scopes on the initial point. Methods that consume $3$-adic
+equidistribution \emph{along the orbit of an ensemble} --- in particular
+the Fourier-analytic route of Tao \cite{Tao2022}, which transports the
+initial distribution of an ensemble rather than finite windows of a single
+orbit --- remain outside the scope of all our obstructions. We analyze the
+quantitative $3$-adic mixing problem in a companion paper.
+
+\emph{The cycle route.} Diophantine bounds on nontrivial cycles (linear
+forms in logarithms combined with verified lower bounds on cycle elements
+\cite{Eliahou1993,SimonsDeWeger2005,Rhin1987,Barina2021}) address the
+periodicity half of the conjecture and are independent of everything here;
+the appendix records the standard bound in the form we use.
+
+Finally, the barrier perspective suggests reading the classical density
+theorems not as progress toward the conjecture but as exact complexity
+measurements of a proof system: the certified density $1-2^{-(1-H(\theta))k}$
+and the certificate count $2^{H(\theta)k}$ are two faces of the same
+entropy, and the fine structure of the frontier is governed by the
+continued fraction of $\log_2 3$ (Theorems~C--E) --- the same Diophantine
+data that governs the cycle route. We take this coincidence as evidence
+that the difficulty quantified here is intrinsic to the problem and not to
+one formalization.
+
+\section*{Data availability statement}
+% TODO(author): confirm the repository URL / DOI before submission.
+All code and data supporting this study --- the certificate artifact, the
+Lean~4 proof with pinned toolchain, the independent verifier, and one
+self-contained exact-arithmetic script per computational claim, with a
+claim-to-script map and SHA-256 manifest --- are openly available in the
+reproduction repository \texttt{collatz-barrier-repro}
+(\url{https://github.com/hikaruwakaura/collatz-barrier-repro}); a
+DOI-stamped archival snapshot of the exact version used here will be
+deposited upon acceptance. The same material is included as the
+supplementary bundle of this submission.
+
+\appendix
+
+\section{The standard cycle bound (reproduction)}\label{app:cycle}
+
+For completeness we record the cycle bound used in
+Section~\ref{sec:discussion}; the method is that of Eliahou
+\cite{Eliahou1993} with the current verification bound, and no novelty is
+claimed. Let a nontrivial cycle of the odd-to-odd accelerated map have odd
+elements $m_1,\dots,m_K$ with $2$-adic valuations summing to $A$.
+Multiplying the relations $m_{j+1}2^{a_j}=3m_j+1$ around the cycle gives
+$2^A=\prod_j(3+1/m_j)$, hence with $M=\min_j m_j$,
+\[
+0<A-K\log_2 3\le \frac{K}{3M\ln 2}.
+\]
+With $M>2^{68}$ \cite{Barina2021} the right side is below
+$K\cdot 2^{-69}$, forcing $A=\ceil{K\log_2 3}$ and making
+$\|K\log_2 3\|^{+}$ (the distance to the integer \emph{above}) at most
+$K\cdot 2^{-69}$. Running the one-sided ladder of best approximations of
+$\log_2 3$ (mediant steps between convergents, compared by exact integer
+powers $2^p$ vs $3^q$) shows the smallest such $K$ satisfies
+\[
+K\ \ge\ 8{,}963{,}457{,}696,
+\]
+so any nontrivial cycle has more than $2.3\times 10^{10}$ steps of the map
+$C$. Stronger bounds via $m$-cycle theory are known
+\cite{SimonsDeWeger2005}, and high cycles have recently been eliminated
+altogether \cite{Knight2026}.
+
+\begin{thebibliography}{99}
+
+\bibitem{Terras1976}
+R.~Terras,
+\emph{A stopping time problem on the positive integers},
+Acta Arith. \textbf{30} (1976), 241--252.
+
+\bibitem{Everett1977}
+C.~J. Everett,
+\emph{Iteration of the number-theoretic function $f(2n)=n$, $f(2n+1)=3n+2$},
+Adv. Math. \textbf{25} (1977), 42--45.
+
+\bibitem{Lagarias1985}
+J.~C. Lagarias,
+\emph{The $3x+1$ problem and its generalizations},
+Amer. Math. Monthly \textbf{92} (1985), 3--23.
+
+\bibitem{Lagarias2010}
+J.~C. Lagarias (ed.),
+\emph{The Ultimate Challenge: The $3x+1$ Problem},
+American Mathematical Society, Providence, RI, 2010.
+
+\bibitem{Tao2022}
+T.~Tao,
+\emph{Almost all orbits of the Collatz map attain almost bounded values},
+Forum Math. Pi \textbf{10} (2022), e12.
+
+\bibitem{Barina2021}
+D.~Barina,
+\emph{Convergence verification of the Collatz problem},
+J. Supercomput. \textbf{77} (2021), 2681--2688.
+
+\bibitem{Eliahou1993}
+S.~Eliahou,
+\emph{The $3x+1$ problem: new lower bounds on nontrivial cycle lengths},
+Discrete Math. \textbf{118} (1993), 45--56.
+
+\bibitem{SimonsDeWeger2005}
+J.~Simons and B.~de~Weger,
+\emph{Theoretical and computational bounds for $m$-cycles of the $3n+1$-problem},
+Acta Arith. \textbf{117} (2005), 51--70.
+
+\bibitem{Rhin1987}
+G.~Rhin,
+\emph{Approximants de Pad\'e et mesures effectives d'irrationalit\'e},
+in: S\'eminaire de Th\'eorie des Nombres, Paris 1985--86,
+Progr. Math. \textbf{71}, Birkh\"auser, 1987, 155--164.
+
+\bibitem{KrasikovLagarias2003}
+I.~Krasikov and J.~C. Lagarias,
+\emph{Bounds for the $3x+1$ problem using difference inequalities},
+Acta Arith. \textbf{109} (2003), 237--258.
+
+\bibitem{ApplegateLagarias1995}
+D.~Applegate and J.~C. Lagarias,
+\emph{Density bounds for the $3x+1$ problem. I. Tree-search method},
+Math. Comp. \textbf{64} (1995), 411--426.
+
+\bibitem{Wirsching1998}
+G.~J. Wirsching,
+\emph{The Dynamical System Generated by the $3n+1$ Function},
+Lecture Notes in Math. \textbf{1681}, Springer, Berlin, 1998.
+
+\bibitem{Conway1972}
+J.~H. Conway,
+\emph{Unpredictable iterations},
+in: Proc. 1972 Number Theory Conference, Univ. Colorado, Boulder, 1972,
+49--52.
+
+\bibitem{KurtzSimon2007}
+S.~A. Kurtz and J.~Simon,
+\emph{The undecidability of the generalized Collatz problem},
+in: TAMC 2007, Lecture Notes in Comput. Sci. \textbf{4484}, Springer, 2007,
+542--553.
+
+\bibitem{BernsteinLagarias1996}
+D.~J. Bernstein and J.~C. Lagarias,
+\emph{The $3x+1$ conjugacy map},
+Canad. J. Math. \textbf{48} (1996), 1154--1169.
+
+\bibitem{Korec1994}
+I.~Korec,
+\emph{A density estimate for the $3x+1$ problem},
+Math. Slovaca \textbf{44} (1994), 85--89.
+
+\bibitem{RozierTerracol2026}
+O.~Rozier and C.~Terracol,
+\emph{Paradoxical behavior in Collatz sequences},
+Discrete Math. (2026), art.~115167; arXiv:2502.00948.
+
+\bibitem{Niu2026}
+T.~Niu,
+\emph{Parity vectors and paradoxical sequences in the accelerated Collatz map},
+arXiv:2605.13886 (2026).
+
+\bibitem{FernandezIbanez2026}
+C.~Fern\'andez and S.~Ib\'a\~nez,
+\emph{Christoffel words as extremal structures in Collatz dynamics},
+arXiv:2607.24844 (2026).
+
+\bibitem{Knight2026}
+K.~Knight,
+\emph{Collatz high cycles do not exist},
+Discrete Math. \textbf{349} (2026), no.~3, art.~114812.
+
+\bibitem{Lothaire2002}
+M.~Lothaire,
+\emph{Algebraic Combinatorics on Words},
+Encyclopedia Math. Appl. \textbf{90}, Cambridge University Press, 2002.
+
+\end{thebibliography}
+
+\end{document}
