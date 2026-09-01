@@ -66,9 +66,10 @@ $B_{n+1}=B_n^{\,a_{n+1}}B_{n-1}$ governed by the continued fraction of
 $\log_2 3$. As an unconditional byproduct we show that the number of
 potential counterexamples up to $N$ --- integers whose orbit never
 descends below its starting point --- is $O(N^{H(\theta)+o(1)})
-=O(N^{0.950})$, the same entropy exponent. The core arithmetic lemma
-(classes $-1 \bmod 2^m$ climb for $m-1$
-steps with unit $2$-adic valuations) is machine-verified in Lean~4. We
+=O(N^{0.950})$, the same entropy exponent. The core arithmetic lemmas
+(the climbing towers $-1\bmod 2^m$, the affine identity, and the collapse
+and persistence lemmas behind the robustness theorem) are machine-verified
+in Lean~4 from the standard axioms. We
 emphasize that the density statement underlying (ii) is classical (Terras
 1976, Everett 1977); our contribution is the \emph{uniform lower bound against
 arbitrary certificate systems}, the exact non-asymptotic constants, and the
@@ -136,10 +137,11 @@ and arbitrary mixtures of depths, and we establish the following.
   fraction of $\log_2 3$; and the language of climbing words is not
   regular, so the certificate frontier admits no finite-automaton
   compression.
-\item[(iv)] \emph{Machine verification}: the core arithmetic lemma --- the
-  classes $-1 \bmod 2^m$ climb monotonically for $m-1$ steps with unit
-  $2$-adic valuations --- is verified in Lean~4 from the standard axioms
-  alone (Section~\ref{sec:artifacts}).
+\item[(iv)] \emph{Machine verification}: the core arithmetic lemmas ---
+  the climbing towers $-1\bmod 2^m$, the affine identity with its
+  remainder bound, both halves of the adaptive collapse lemma, and the
+  persistence step behind Theorem~A$'$ --- are verified in Lean~4 from
+  the standard axioms alone (Section~\ref{sec:artifacts}).
 \item[(v)] \emph{A verified computational artifact}: a depth-$20$
   certificate system (4404 certificates, exact cover of $\N\setminus\{1\}$
   up to the climbing classes, density $97.39\%$) checked by an independent
@@ -454,7 +456,9 @@ by minimality of $j_1$. (b) Descent at $j_1$ is
 $n(2^{j_1}-3^{e_{j_1}})>\beta_{j_1}$; the left side is $\ge n$ (the bracket
 is a positive integer) and $\beta_{j_1}\le 3^{j_1}$ by
 Lemma~\ref{lem:terras}(b). The consequence follows since steps $j<j_1$
-never descend by (a) and step $j_1$ descends by (b).
+never descend by (a) and step $j_1$ descends by (b). Both halves, together
+with the affine identity and the remainder bound $\beta_j+2^j\le 3^j$, are
+machine-verified in Lean~4 (Section~\ref{sec:artifacts}).
 \end{proof}
 
 \begin{lemma}[persistence of climbing]\label{lem:persist}
@@ -468,7 +472,8 @@ modulus is infinite.
 \begin{proof}
 Prefix conditions up to $k$ are unchanged, and at $k+1$:
 $3^{e_k+1}=3\cdot 3^{e_k}>3\cdot 2^k>2^{k+1}$. Iterating gives the second
-claim; the third is the Chinese remainder theorem.
+claim; the third is the Chinese remainder theorem. The arithmetic step is
+machine-verified (Section~\ref{sec:artifacts}).
 \end{proof}
 
 \begin{thmAp}
@@ -575,7 +580,7 @@ $n(2^{j_1}-3^{e_{j_1}})\le\beta_{j_1}\le 3^{j_1}$. If
 $3^{e_{j_1}}\le 2^{j_1-1}$ the gap is at least $2^{j_1-1}$; otherwise
 $2^{j_1}-3^{e_{j_1}}=3^{e_{j_1}}(e^{\Lambda}-1)\ge 2^{j_1-1}\Lambda$ with
 $\Lambda=j_1\ln 2-e_{j_1}\ln 3\ge c\,j_1^{-13.3}$ \cite{Rhin1987}. Either
-way $n\le 2(3/2)^{j_1}j_1^{13.3}/c$, which is smaller than $2^m<n$ for
+way $n\le 2(3/2)^{j_1}j_1^{13.3}/c$, which is less than $2^m<n$ for
 every $j_1\le m$ once $m\ge m_0(c)$, effectively. Hence every
 $n\in\mathcal{E}\cap(M,2M]$ is climbing at depth $m$; each residue mod
 $2^m$ occurs exactly once in $(M,2M]$, so
@@ -961,15 +966,27 @@ of each class (which suffices for the whole class by monotonicity of the
 affine form), and confirms the climbing condition for each unresolved
 class. All arithmetic is exact (arbitrary-precision integers).
 
-\subsection{Machine verification of the core lemma}
-Lemma~\ref{lem:climb} is verified in Lean~4 as four theorems
-(\texttt{climb}, \texttt{climb\_mod}, \texttt{climb\_ge}, \texttt{barrier})
-in the artifact \texttt{Barrier.lean}, compiled with core Lean only (no
-external libraries), toolchain pinned to
-\texttt{leanprover/lean4:v4.32.2}. \texttt{\#print axioms} reports exactly
-\texttt{[propext, Quot.sound]}, the standard kernel axioms, and no
-\texttt{sorry}. We emphasize that the machine verification covers this core
-lemma only; the counting and rate theorems are verified by conventional
+\subsection{Machine verification of the core lemmas}
+The arithmetic cores of Theorems~A and A$'$ are verified in Lean~4,
+compiled with core Lean only (no external libraries), toolchain pinned to
+\texttt{leanprover/lean4:v4.32.2}, with no \texttt{sorry}:
+\begin{itemize}
+\item \texttt{Barrier.lean}: Lemma~\ref{lem:climb} as four theorems
+  (\texttt{climb}, \texttt{climb\_mod}, \texttt{climb\_ge},
+  \texttt{barrier}); axioms exactly \texttt{[propext, Quot.sound]}.
+\item \texttt{Collapse.lean}: the affine identity of
+  Lemma~\ref{lem:terras}(b) for the full compressed map
+  (\texttt{affine}), the remainder bound $\beta_j+2^j\le 3^j$
+  (\texttt{beta\_bound}), both halves of the collapse lemma
+  (Lemma~\ref{lem:collapse}) as \texttt{climbing\_no\_descent} ($2^j<
+  3^{e_j}\Rightarrow T^j(n)>n$ for every $n\ge 1$) and
+  \texttt{descent\_forced} ($3^{e_j}<2^j$ and $n>3^j\Rightarrow
+  T^j(n)<n$), and the arithmetic core of the persistence lemma
+  (Lemma~\ref{lem:persist}) as \texttt{climb\_extend}; axioms within
+  \texttt{[propext, Classical.choice, Quot.sound]}, the standard Lean
+  axioms.
+\end{itemize}
+The counting and rate theorems themselves are verified by conventional
 proof plus the independent computations described above.
 
 \subsection{Reproducibility and data availability}
@@ -989,6 +1006,8 @@ artifact & SHA-256\\
  & \texttt{2ddd65a7329b3d3309197150ad3d78fc}\\
 \texttt{Barrier.lean} & \texttt{c416508cda41b0df105bae91801d70c3}\\[-2pt]
  & \texttt{7a3e2f65c0251bae1c90683492f4ec7d}\\
+\texttt{Collapse.lean} & \texttt{08191fc7b0114d8504a9c930ae911ad7}\\[-2pt]
+ & \texttt{075f33d05a38b6e26612bad2cf50b2f3}\\
 \bottomrule
 \end{tabular}
 \end{center}

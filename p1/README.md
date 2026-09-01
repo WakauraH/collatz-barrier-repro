@@ -16,6 +16,7 @@ no mathlib).
 |---|---|---|
 | Lemma 2.1 (affine form / Terras bijection), climb lemma, rigidity identities, descent for odd n <= 1e6 | `python collatz.py` | "all self-checks passed" |
 | Machine verification of the climb lemma (Lemma 4.2) | `elan run --install leanprover/lean4:v4.32.2 lean Barrier.lean` (or `lean Barrier.lean` with the pinned toolchain active) | four theorems, axioms `[propext, Quot.sound]` only |
+| Machine verification of the affine identity, remainder bound, collapse lemma (both halves), persistence step (Theorem A') | `elan run --install leanprover/lean4:v4.32.2 lean Collapse.lean` | five theorems, axioms within `[propext, Classical.choice, Quot.sound]`, no sorry |
 | Depth-20 certificate system (Sec. 9): generation | `python certtree.py 20` | 4404 certificates, 27328 climbing classes, exact cover |
 | Depth-20 system: independent verification | `python verify.py` | "OK — 4404 certificates verified, 27328 unresolved classes at mod 2^20, exact cover confirmed" |
 | Theorem B sandwich (k <= 1600), rotation lemma exhaustive check (k <= 16) | `python exp7_gamma_sturmian_cycle.py` | sandwich holds for all k, rotation check passes |
