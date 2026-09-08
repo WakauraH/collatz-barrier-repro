@@ -54,8 +54,9 @@ $2^K \bmod 3^m$ on full periods. With an audited weighted-$\ell^1$
 bookkeeping these yield a complete conditional proof of
 $\delta_m\le\mathrm{poly}(m)\,2^{-0.0504\,m}$, whose single unproven
 input is isolated as a finite-orbit quantitative form of Furstenberg
-$\times 2\times 3$ rigidity. For fixed $m$ that input is decidable: we
-certify unconditional bounds at $m=64$, $128$, $256$. Certified
+$\times 2\times 3$ rigidity. For fixed $m$ and finitely many frequencies
+that input is decidable: we certify it, with all numerical error
+accounted, on the full extended window at $m=64$, $128$, $256$. Certified
 computations to $m=1200$ support the sharp-rate conjecture
 $\delta_m=\Theta(2^{-I_0m}m^{-c})$.
 \end{abstract}
@@ -102,8 +103,9 @@ However, the exact decay rate of $\delta_m$ --- even its numerical value
 --- appears never to have been determined. Here we determine it
 numerically with certified lattice computations, identify its mechanism,
 prove the structural theorems that reduce the upper-bound problem to a
-single isolated arithmetic statement, and certify unconditional
-exponential bounds for fixed levels $m\le 256$. Our results are of four
+single isolated arithmetic statement, and certify that statement's inputs
+--- with all numerical error accounted --- on the full frequency window
+at fixed levels $m\le 256$. Our results are of four
 kinds, and we keep the four statuses --- \emph{theorem},
 \emph{computational fact} (exact or certified computation),
 \emph{conditional theorem}, and \emph{conjecture} --- explicitly labeled
@@ -168,14 +170,14 @@ $m=1200$ showing that the extremal frequency exponent satisfies
 $k^*=m\log_2 3-(7.0\pm0.3)$ with the deficit \emph{constant} over
 $m=200$--$1200$, and a decay rate in $[0.0790, 0.0800]$ bits per level
 approaching $I_0$ one-sidedly; a boundary-layer structure theory
-(Section~\ref{sec:mech}); and unconditional certified instances
-\[
-\delta_{64}\le C\,2^{-0.0350\cdot 64},\qquad
-\delta_{128}\le C\,2^{-0.0406\cdot 128},\qquad
-\delta_{256}\le C\,2^{-0.0457\cdot 256},
-\]
-with all band constraints closing at positive slack and the certified
-rate increasing toward $0.0504$ (Section~\ref{sec:instances}).
+(Section~\ref{sec:mech}); and certified instances on the full extended
+frequency window at $m=64$, $128$, $256$: unconditionally
+$\sup_{k\in W_m}|g_m(2^k)|\le 2^{-4.97},\ 2^{-8.4},\ 2^{-15.0}$
+respectively, and the band-rate inputs of the conditional theorem hold on
+$W_m$ with positive slack at rates $0.0350$, $0.0406$, $0.0457$ increasing
+toward $0.0504$ (Section~\ref{sec:instances}). Statements about
+$\delta_m$ itself at fixed $m$ additionally require the extremal frequency
+to lie in $W_m$, which is verified exhaustively for $m\le 15$.
 
 \subsection*{Conjecture} The sharp rate
 (Conjecture~\ref{conj:c1}): $\delta_m=\Theta(2^{-I_0m}\,m^{-c})$.
@@ -701,7 +703,8 @@ $q^{\delta}$. The hypothesis is also adjacent to (but strictly weaker
 in its averaged form than) the Erd\H{o}s ternary-digit problem for
 $2^n$ \cite{Erdos1979,Lagarias2009}. We therefore regard it as
 precisely isolated but genuinely open; it is, however, decidable for
-each fixed $m$, which is what Section~\ref{sec:instances} exploits.
+each fixed $m$ on any finite set of frequencies, which is what
+Section~\ref{sec:instances} exploits.
 
 \subsection{The conditional theorem}
 
@@ -750,40 +753,59 @@ precise obstruction --- in our view a more tractable target than the
 Collatz conjecture itself, but of the $\times 2\times 3$ family.
 \end{remark}
 
-\section{Unconditional certified instances}\label{sec:instances}
+\section{Certified instances on the window}\label{sec:instances}
 
-For each fixed $m$, Hypothesis~\ref{hyp:clocal} is not needed: the band
-inequalities are finitely many verifiable statements.
+For each fixed $m$ and each fixed frequency, Hypothesis~\ref{hyp:clocal}
+is not needed: Tao's product inequality (7.5) is a theorem, and its
+right-hand side $B_m(k)$ at the frequency $2^k$ is a finite computation.
+We stress at the outset what such computations can and cannot certify:
+they bound $|g_m(2^k)|$ for the frequencies actually scanned, and no
+finite scan reaches the $2\cdot 3^{m-1}$ frequencies of a level $m\ge
+16$; statements about $\delta_m$ itself therefore rest on the window
+localization of the extremal frequency (exhaustively verified for
+$m\le 15$, Computational Fact~\ref{cf:numerics}(a)).
 
-\begin{theorem}[finite certification]\label{thm:instances}
-For each fixed $m$, the inequality
-$\delta_m\le C\,2^{-r m}$, with $r=r(\mu)$ as in \eqref{eq:rmu} and the
-constraint system of Theorem~\ref{thm:conditional} evaluated on all
-window frequencies, is decidable in time $O(m^4)$. The certification
-succeeds at:
+\begin{theorem}[finite certification on the window]\label{thm:instances}
+Fix $m$ and a finite set $W$ of exponents. For each $k\in W$ the product
+bound $B_m(k)$ is computable with every approximation accounted on the
+upper side (truncation of the step law, pruning of the dynamic program,
+and floating-point rounding), yielding numbers $U_m(k)\ge |g_m(2^k)|$.
+On the extended window $W_m=[-80,\,\floor{1.66m}+20]$:
 \[
-\begin{array}{llll}
-m=64: & 207\ \text{frequencies}, & \mu=-0.10,\ r=0.0350, &
-\text{min slack } +0.0078;\\
-m=128: & 313\ \text{frequencies}, & \mu=-0.12,\ r=0.0406, &
-\text{min slack } +0.0212;\\
-m=256: & 525\ \text{frequencies}, & \mu=-0.14,\ r=0.0457, &
-\text{min slack } +0.0102.
+\begin{array}{lllll}
+m=64: & 207\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-4.97}, &
+\mu=-0.10,\ r=0.0350, & \text{slack } +0.0078;\\
+m=128: & 313\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-8.4}, &
+\mu=-0.12,\ r=0.0406, & \text{slack } +0.021;\\
+m=256: & 525\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-15.0}, &
+\mu=-0.14,\ r=0.0457, & \text{slack } +0.010.
 \end{array}
 \]
-In particular $\delta_{256}\le C\,2^{-11.7}$ unconditionally, and the
-certified rate increases toward the conditional rate $0.0504$
-(band-extraction value at $m=240$), with the binding constraints
-stabilizing in the shoulder band $u\in[-13,-9]$ --- the same band the
-asymptotic analysis identifies as the precision zone.
+Here the window supremum bound is unconditional, and the last two columns
+state that the band-rate inputs of Theorem~\ref{thm:conditional} hold on
+$W_m$ at the given $(\mu,r(\mu))$ with the stated minimal slack (zero
+safety margin: all numerical error is inside $U_m$).
 \end{theorem}
 
-The computations were performed in floating point with well-conditioned
-quantities and stated slacks at least $+0.008$; replacing them by outward
-interval arithmetic is mechanical and changes no conclusion at the
-stated precision. We regard the growth of the certified rate
-($0.0350\to 0.0406\to 0.0457$, one doubling at a time) as strong
-structural corroboration of Theorem~\ref{thm:conditional}.
+\begin{remark}[scope]\label{rem:instscope}
+(i) The certified rate of the constraint system increases toward the
+conditional rate $0.0504$ ($0.0350\to0.0406\to0.0457$, one doubling at a
+time), with the binding constraints stabilizing in the shoulder band
+$u\in[-13,-9]$ --- the same band the asymptotic analysis identifies as
+the precision zone; we regard this as structural corroboration of the
+inputs of Theorem~\ref{thm:conditional}. (ii) Under window localization
+of the extremal frequency, $\delta_m=\sup_{W_m}|g_m|$ and the exact window
+computation gives the much smaller true value
+(e.g.\ $\log_2\delta_{256}\approx-30.7$); the product bound is the
+\emph{certifiable} envelope, not the truth. (iii) The error accounting:
+the step law is truncated at $b\le 40$ and the omitted mass is added as
+$(m/2)\sum_{b>40}(b-1)2^{-b}$ (union bound, $|f|\le 1$); pruned dynamic
+program states are added back at their true scale (future factors are at
+most $1$); each $|f|$ receives $+10^{-11}$ and the total a factor
+$1+10^{-8}$, both exceeding the floating-point error by more than two
+orders of magnitude. The certified numbers reproduce the unaccounted
+floating-point ones to within $10^{-4}$ in rate.
+\end{remark}
 
 \section{The sharp-rate conjecture and the three clocks}\label{sec:conj}
 
