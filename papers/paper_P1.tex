@@ -56,7 +56,8 @@ of congruence classes of arbitrary moduli and adaptive stopping times, and
 the same collapse yields an unconditional bound $N^{H(\log_3 2)}$ on the
 number of potential counterexamples up to $N$. The certificate frontier is
 driven by the Sturmian word of slope $\log_3 2$ and is not regular. The
-counting theorem and the core lemmas are machine-verified in Lean~4.
+counting theorem, the sandwich, and the core lemmas are machine-verified
+in Lean~4.
 \end{abstract}
 
 \noindent\textbf{Keywords:} $3x+1$ problem; Collatz conjecture; proof
@@ -122,13 +123,13 @@ and arbitrary mixtures of depths, and we establish the following.
   fraction of $\log_2 3$; and the language of climbing words is not
   regular, so the certificate frontier admits no finite-automaton
   compression.
-\item[(iv)] \emph{Machine verification}: Theorem~A itself is verified
-  in Lean~4 in an abstract certificate-system formulation (as an
-  injection from climbing classes into deep certificates), and so are
-  the core arithmetic lemmas behind Theorems~A$'$ and B --- the
-  climbing towers $-1\bmod 2^m$, the affine identity with its remainder
-  bound, both halves of the adaptive collapse lemma, the persistence
-  step, and the rotation lemma --- all from the standard axioms alone
+\item[(iv)] \emph{Machine verification}: Theorems~A and B are verified
+  in Lean~4 --- A in an abstract certificate-system formulation (as an
+  injection from climbing classes into deep certificates), B in full
+  against Mathlib --- and so are the core arithmetic lemmas behind
+  Theorem~A$'$ (the climbing towers $-1\bmod 2^m$, the affine identity
+  with its remainder bound, both halves of the adaptive collapse lemma,
+  and the persistence step), all from the standard axioms alone
   (Section~\ref{sec:artifacts}).
 \item[(v)] \emph{A verified computational artifact}: a depth-$20$
   certificate system (4404 certificates, exact cover of $\N\setminus\{1\}$
@@ -1015,12 +1016,29 @@ compiled with core Lean only (no external libraries), toolchain pinned to
   only on $n \bmod 2^j$ (the part of Lemma~\ref{lem:terras} the proof
   uses). Axioms within \texttt{[propext, Classical.choice,
   Quot.sound]}.
+\item \texttt{TheoremB.lean} (separate Lake project, Lean
+  \texttt{v4.33.1} with Mathlib pinned at the matching release):
+  \emph{Theorem B in full}. Words are \texttt{List.Vector Bool k}, the
+  climbing count $c(k)$ is the cardinality of the climbing words, and
+  $e_0=\min\{e: 2^k<3^e\}$; the theorem \texttt{theoremB} states
+  $\binom{k}{e_0}\le k\cdot c(k)$ and $c(k)\le (k+1)\binom{k}{e_0}$ for
+  $k\ge 1$. The lower bound composes the integer rotation theorem with
+  the list identities for prefix counts of \texttt{List.rotate} and the
+  fiber bound of the map ``word $\mapsto$ its climbing rotation''
+  (\texttt{Finset.card\_le\_mul\_card\_image}); the upper bound uses
+  $2e_0>k$ and the monotone decrease of binomial coefficients above the
+  middle; the identification of $\#\{\text{words with } e \text{ ones}\}$
+  with $\binom{k}{e}$ goes through indicator vectors of
+  \texttt{Finset.powersetCard}. Axioms within \texttt{[propext,
+  Classical.choice, Quot.sound]}; no \texttt{sorry}.
 \end{itemize}
-Of the main results, Theorem~A is thus machine-verified in full (modulo
-the trivial reading of an injection as a cardinality bound), and
-Theorems~A$'$ and B have their arithmetic cores machine-verified; the
-remaining steps of A$'$ and B, and Theorems~C--G, are verified by
-conventional proof plus the independent computations described above.
+Of the main results, Theorems~A and B are thus machine-verified in full
+(A modulo the trivial reading of an injection as a cardinality bound;
+B against Mathlib), and Theorem~A$'$ has its arithmetic core
+machine-verified; the remaining steps of A$'$, and Theorems~C--G, are
+verified by conventional proof plus the independent computations
+described above. The three core files use no library at all and can be
+checked in seconds; the Theorem~B project requires a Mathlib cache.
 
 \subsection{Reproducibility and data availability}
 All computations use exact integer (or exact rational) arithmetic. The
@@ -1045,6 +1063,8 @@ artifact & SHA-256\\
  & \texttt{75f14921756e17dc13ab48bd5863b97a}\\
 \texttt{Counting.lean} & \texttt{09619f3b7862934a14ef7fb9ed9d4646}\\
  & \texttt{a50ea425a4622f819acf27bded5a4396}\\
+\texttt{TheoremB.lean} & \texttt{0b2f7f732e6e42dc45624531a3e5c05a}\\
+ & \texttt{8847c88912e3ed3321a716dd8fd3879a}\\
 \bottomrule
 \end{tabular}
 \end{center}
