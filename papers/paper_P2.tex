@@ -68,7 +68,7 @@ $\times 2\times 3$ rigidity; experimental mathematics.
 \noindent\textbf{2020 Mathematics Subject Classification:} Primary 11B83;
 Secondary 11K16, 37P10, 60H25.
 
-\noindent\textbf{Word count:} approximately 4{,}800 words.
+\noindent\textbf{Word count:} approximately 5{,}200 words.
 
 \section{Introduction}\label{sec:intro}
 
@@ -685,6 +685,31 @@ deep bands the entry valuations match $\Geom(1/2)$ to three digits
 ($0.482/0.272/0.129/0.067$); in the shallow shoulder band the tail is
 enhanced by a bounded factor ($\le 5$ at the measured depths), which is
 harmless since Hypothesis~\ref{hyp:clocal} permits any absolute $C$.
+
+\begin{remark}[what Lemma~\ref{lem:pair} alone gives, and why it is not enough]
+\label{rem:pairalone}
+The pair-spacing lemma does yield an unconditional statement: along a
+monotone segment of length $L$ the walk enters each chain at most once,
+an entry of valuation $\ge h$ lies in a chain of depth $\ge h$, and
+Lemma~\ref{lem:pair} bounds the number of such chains by
+$L/(2\alpha h-c)+1$; summing over $h$,
+\[
+\sum_{\text{entries}}\nu_2(v_{\mathrm{entry}})\;\le\;
+\frac{L}{2\alpha}\bigl(\ln h_{\max}+O(1)\bigr)+h_{\max},
+\qquad h_{\max}\le\log_2(\varepsilon 3^d),
+\]
+deterministically. This is exactly the shape of the logarithmic loss:
+the implied bound on black steps, $(L/4\alpha)(\ln h_{\max}+O(1))$,
+exceeds $L$ once $d\gtrsim 250$, so it guarantees no white points
+asymptotically, and a per-entry average of order $\log d$ follows only
+when the number of entries is itself of order $L$ --- which is again an
+equidistribution input. Thus Lemma~\ref{lem:pair} cannot replace
+Hypothesis~\ref{hyp:clocal}: it controls the \emph{population} of deep
+chains but not their occupation by the walk, and the geometric depth law
+is precisely the missing ingredient. (A saturated population allowed by
+the lemma realizes the $\sim 0.6\log_2 d$ per-entry average
+numerically.)
+\end{remark}
 
 \subsection{Classification of the hypothesis}
 Hypothesis~\ref{hyp:clocal} is a \emph{finite-orbit, quantitative} form

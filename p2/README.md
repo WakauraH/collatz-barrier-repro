@@ -30,8 +30,9 @@ in each script's header. Run everything inside `supplement/`
 | Wrap budget < 1e-4; correlation length ~ 8 | `exp19_wrap_budget.py` | weighted wrap share; autocorrelation |
 | Band rates a(delta) (sharp all-b product DP along Tao's update process) | `exp21_tao_product.py` (`tao_bound_rate`), `exp22_close_chain.py` | measured band rates; constraint-system closure at mu = -0.16, r = 0.0504 |
 | Lemmas 9.1-9.3 support: run lengths, re-seeding rate 0.2%, entry valuations | `exp24_lemmaC.py`, `exp25_anticoncentration.py` | E[run] = 1.00-1.14; entry nu_2 vs Geom(1/2) |
+| Remark after Lemma 9.3 (Lemma A alone): size-biased per-entry valuation in a saturated Lemma-A population | `exp31_lemmaA_sizebias.py` | ~0.6 log2(m) per entry; total-form bound only |
 | Lemma 6.1 + Thm 6.2 (geometric law on cycles): identity exhaustive (m <= 12, sigma <= 6), geometric frequencies | `exp29_cstat_verify.py` | zero mismatches; 0.5000/0.2500/0.1250/0.0625 |
-| Thm 10.1 (certified instances m = 64, 128, 256) | `exp26_certify_instance.py [m]` | run with argument 64 / 128 / 256; logs `exp26_m128.log`, `exp26_m256.log` included |
+| Thm 10.1 (certified instances on the window, m = 64, 128, 256): error-accounted product bounds U_m(k), window suprema, constraint system with zero margin | `exp30_rigorous_window_bound.py [m]` (rigorous; logs `exp30_m*.log` included); `exp26_certify_instance.py [m]` (original floating-point driver, logs `exp26_m128.log`, `exp26_m256.log`) | window sup <= 2^{-4.97} / 2^{-8.4} / 2^{-15.0}; (mu, r) = (-0.10, 0.0350) / (-0.12, 0.0406) / (-0.14, 0.0457) with positive slack. Scope: scanned window only. |
 
 ## Notes
 
