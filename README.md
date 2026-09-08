@@ -10,25 +10,32 @@ Inc.):
   needs at least c(k) = 2^{H(log_3 2)k + o(k)} certificates of depth > k,
   robustly under disjunctions and adaptive stopping; non-regularity and
   Sturmian structure of the certificate frontier; an unconditional
-  power-saving count N^{0.950} of potential counterexamples; the core
-  arithmetic lemma machine-verified in Lean 4.
+  power-saving count N^{0.950} of potential counterexamples. Theorem A
+  (counting) and Theorem B (the sandwich) are machine-verified in Lean 4 —
+  A and the core lemmas in dependency-free core Lean (`p1/*.lean`), B
+  against Mathlib (`p1/lean_mathlib/`).
 - **P2** — *The 3-adic mixing rate of the Syracuse random variable*
   (`papers/paper_P2.pdf`). Structural theorems reducing the exponential
   decay of Tao's Syracuse Fourier coefficient delta_m to a single
   isolated x2x3-rigidity input; an exact geometric 2-adic law on full
-  periods; unconditional certified bounds at m = 64, 128, 256; certified
-  numerics to m = 1200 and the sharp-rate conjecture
+  periods; error-accounted certification of that input on the full
+  frequency window at m = 64, 128, 256 (`p2/exp30_*`); certified numerics
+  to m = 1200 and the sharp-rate conjecture
   delta_m = Theta(2^{-I_0 m} m^{-c}), I_0 = (1-H(theta))/theta.
 
 ## Layout
 
 ```
 papers/   frozen manuscripts (tex + pdf)
-p1/       one self-contained artifact per computational claim of P1
-          (Lean proof + pinned toolchain, certificate JSON, independent
-          verifier, exact-arithmetic scripts) — see p1/README.md
+p1/       one self-contained artifact per computational claim of P1:
+          Barrier/Collapse/Rotation/Counting.lean (core Lean, pinned
+          toolchain v4.32.2), certificate JSON, independent verifier,
+          exact-arithmetic scripts — see p1/README.md
+p1/lean_mathlib/   Lake project (Lean v4.33.1 + Mathlib v4.33.1) with
+          TheoremB.lean; run `lake exe cache get && lake build`
 p2/       same for P2 (exponent-lattice computations, audits, band-rate
-          DPs, certification drivers + logs) — see p2/README.md
+          DPs, error-accounted window certification exp30 + logs) — see
+          p2/README.md
 ```
 
 Each `README.md` inside `p1/` and `p2/` contains the full
@@ -53,7 +60,9 @@ the toolchain is pinned by `p1/lean-toolchain` to `leanprover/lean4:v4.32.2`
 cd p1 && elan run --install leanprover/lean4:v4.32.2 lean Barrier.lean
 ```
 
-Expected: four theorems, axioms `[propext, Quot.sound]` only.
+Expected: four theorems, axioms `[propext, Quot.sound]` only. The same
+command checks `Collapse.lean`, `Rotation.lean`, and `Counting.lean`
+(standard axioms only, no `sorry`).
 
 ## Integrity
 
