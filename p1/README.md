@@ -29,6 +29,7 @@ no mathlib).
 | Theorem A' checks: adaptive collapse (all n <= 2^20, K = 12), persistence c(k+1) >= c(k) with anchor c(20) = 27328, invalidity witnesses (odd moduli q = 5, 7, 11) | `python exp27_adaptive_barrier.py` | "all adaptive-barrier checks passed" |
 | Corollary (counting): exact identity brute force vs c(j)*2^(m-j) (m <= 18), exponent convergence, margin bound B(j) < 2^j (j <= 24) | `python exp28_exceptional_count.py` | "all checks passed", B(j) table |
 | Appendix A cycle bound k >= 8,963,457,696 | `python cyclebound.py` | exact-integer reconstruction of the bound |
+| Corollary 6.6 (counting): for all n in (2^m, 2^{m+1}] staying >= n for m steps, e >= m*theta_M, and #{n} <= sum_{e >= m theta_M} C(m,e) <= 2^{m H(theta_M)} (m <= 22; at m = 20 the count equals c(20) = 27328) | `python exp32_regression_checks.py` (part 1) | "all regression checks passed" |
 
 ## Frozen-artifact hashes (SHA-256)
 

@@ -33,6 +33,7 @@ in each script's header. Run everything inside `supplement/`
 | Remark after Lemma 9.3 (Lemma A alone): size-biased per-entry valuation in a saturated Lemma-A population | `exp31_lemmaA_sizebias.py` | O(log m) per entry in the saturated model (corrected pair spacing h + log2(1/eps) - 1); total-form bound only |
 | Lemma 6.1 + Thm 6.2 (geometric law on cycles): identity exhaustive (m <= 12, sigma <= 6), geometric frequencies | `exp29_cstat_verify.py` | zero mismatches; 0.5000/0.2500/0.1250/0.0625 |
 | Thm 10.1 (certified instances on the window, m = 64, 128, 256): error-accounted product bounds U_m(k), window suprema, constraint system with zero margin | `exp30_rigorous_window_bound.py [m]` (rigorous; logs `exp30_m*.log` for m = 64, 96, 128, 160, 192, 256 included); `exp26_certify_instance.py [m]` (original floating-point driver, logs `exp26_m128.log`, `exp26_m256.log`) | window sup <= 2^{-4.97} / 2^{-8.4} / 2^{-15.0}; (mu, r) = (-0.10, 0.0350) / (-0.12, 0.0406) / (-0.14, 0.0457) with positive slack; finer sampling m = 96/160/192 gives mu = -0.11/-0.13/-0.14 (r = 0.0379/0.0432/0.0457): the certified rate plateaus at 0.0457 (Remark 10.2). Scope: scanned window only. |
+| Lemma 9.2 (pair spacing, exhaustive d <= 9, eps = 1/2, 1/4, 1/10, linear and cyclic: 0 violations; the bound 2*alpha*h - c would have 1284), l^4 identity (m <= 4), Theorem 4.1 weight sign and min 2^{-I_0}, Theorem 5.1 constant C = 1/log(27/16) with Monte Carlo t P(Y>t) -> 1.90 | `python exp32_regression_checks.py` (parts 2-5) | "all regression checks passed" |
 
 ## Notes
 
