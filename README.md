@@ -6,20 +6,23 @@ Inc.):
 
 - **P1** — *Certificate complexity of uniform descent for the 3x+1
   problem* (`papers/paper_P1.pdf`). Proof-complexity lower bounds for the
-  congruence-class descent strategy: every correct certificate system
-  needs at least c(k) = 2^{H(log_3 2)k + o(k)} certificates of depth > k,
-  robustly under disjunctions and adaptive stopping; non-regularity and
-  Sturmian structure of the certificate frontier; an unconditional
-  power-saving count N^{0.950} of potential counterexamples. Theorem A
-  (counting) and Theorem B (the sandwich) are machine-verified in Lean 4 —
+  congruence-class descent strategy: in every correct certificate system
+  the certificates of depth > k occupy all c(k) = 2^{H(log_3 2)k + o(k)}
+  climbing classes mod 2^k, and truncation at depth K leaves density
+  c(K)/2^K uncovered, robustly under disjunctions and adaptive stopping;
+  non-regularity and Sturmian structure of the certificate frontier; an
+  unconditional elementary count O(N^{0.950}) of potential
+  counterexamples. Theorem A (counting) and the Theorem B sandwich are
+  machine-verified in Lean 4 —
   A and the core lemmas in dependency-free core Lean (`p1/*.lean`), B
   against Mathlib (`p1/lean_mathlib/`).
 - **P2** — *The 3-adic mixing rate of the Syracuse random variable*
   (`papers/paper_P2.pdf`). Structural theorems reducing the exponential
-  decay of Tao's Syracuse Fourier coefficient delta_m to a single
-  isolated x2x3-rigidity input; an exact geometric 2-adic law on full
-  periods; error-accounted certification of that input on the full
-  frequency window at m = 64, 128, 256 (`p2/exp30_*`); certified numerics
+  decay of Tao's Syracuse Fourier coefficient delta_m to an isolated
+  x2x3-rigidity hypothesis plus finitely decidable band-rate inputs; an
+  exact geometric 2-adic law on full periods; error-accounted
+  certification of the band-rate inputs on the full frequency window at
+  m = 64, 96, 128, 160, 192, 256 (`p2/exp30_*`); certified numerics
   to m = 1200 and the sharp-rate conjecture
   delta_m = Theta(2^{-I_0 m} m^{-c}), I_0 = (1-H(theta))/theta.
 

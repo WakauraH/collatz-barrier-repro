@@ -131,6 +131,9 @@ if __name__ == "__main__":
         elif u <= 2: zones["line±"].append(a)
         else: zones["wrap"].append(a)
     for z, arr in zones.items():
+        if not arr:
+            print(f"  {z:10s}: (empty at this m)")
+            continue
         print(f"  {z:10s}: min={min(arr):.4f}  n={len(arr)}")
     best = None
     for mu100 in range(-1, -45, -1):

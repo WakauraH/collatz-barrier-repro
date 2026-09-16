@@ -1,0 +1,9 @@
+exp30: m=160, B(m)=77 (tail 4.13e-20 = 2^-64.4), window k in [-80,285] (366 freqs)
+  certified: sup_(window) |g_160(2^k)| <= 2^(-0.06309*160) = 2^(-10.09)   (attained at k=250, u=-3.6)
+  seam/deep : min=0.2452  n=157
+  mid       : min=0.0819  n=153
+  shoulder  : min=0.0661  n=16
+  line±     : min=0.0631  n=10
+  wrap      : min=0.0831  n=30
+  constraint system (certified rates, zero margin): mu=-0.13, r=0.0432, min slack +0.0135
+  NOTE: statements above cover the scanned window only; delta_m itself needs window localization of the extremal frequency (exhaustive for m<=15).

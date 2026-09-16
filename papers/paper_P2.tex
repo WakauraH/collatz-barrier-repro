@@ -43,21 +43,21 @@ email: \texttt{hikaruwakaura@gmail.com}.
 \begin{abstract}
 Let $\delta_m$ be the maximal nontrivial Fourier coefficient of the
 Syracuse random variable modulo $3^m$ --- the quantity whose decay drives
-Tao's almost-all result for the Collatz map. Tao proved superpolynomial
-decay and flagged the exponential improvement as open. We prove five
-structural theorems: an exact one-dimensionalization of the Fourier
+Tao's almost-all result for the Collatz map; Tao proved superpolynomial
+decay and flagged exponential decay as open. We prove five structural
+theorems: an exact one-dimensionalization of the Fourier
 problem onto the exponent lattice; a first-passage renormalization
 identity; a weighted contraction lemma with optimal rate exactly
 $2^{-I_0}$, $I_0=(1-H(\log_3 2))/\log_3 2$; the exact Kesten tail
 exponent $1$; and an exact geometric law for the $2$-adic valuations of
-$2^K \bmod 3^m$ on full periods. With an audited weighted-$\ell^1$
-bookkeeping these yield a complete conditional proof of
-$\delta_m\le\mathrm{poly}(m)\,2^{-0.0504\,m}$, whose single unproven
-input is isolated as a finite-orbit quantitative form of Furstenberg
-$\times 2\times 3$ rigidity. For fixed $m$ and finitely many frequencies
-that input is decidable: we certify it, with all numerical error
-accounted, on the full extended window at $m=64$, $128$, $256$. Certified
-computations to $m=1200$ support the sharp-rate conjecture
+$2^K \bmod 3^m$ on full periods. With a window-audited weighted-$\ell^1$
+bookkeeping these yield a proof architecture for
+$\delta_m\le\mathrm{poly}(m)\,2^{-rm}$, $r>0.045$, with two inputs: a
+local equidistribution hypothesis (a finite-orbit quantitative form of
+Furstenberg $\times 2\times 3$ rigidity) and band-rate estimates decidable
+on finite frequency sets, which we certify with error accounted on the
+full window at $m=64$, $128$, $256$.
+Certified computations to $m=1200$ support the sharp-rate conjecture
 $\delta_m=\Theta(2^{-I_0m}m^{-c})$.
 \end{abstract}
 
@@ -68,7 +68,7 @@ $\times 2\times 3$ rigidity; experimental mathematics.
 \noindent\textbf{2020 Mathematics Subject Classification:} Primary 11B83;
 Secondary 11K16, 37P10, 60H25.
 
-\noindent\textbf{Word count:} approximately 5{,}200 words.
+\noindent\textbf{Word count:} approximately 4{,}900 words.
 
 \section{Introduction}\label{sec:intro}
 
@@ -102,13 +102,13 @@ version of Tao's theorem.
 However, the exact decay rate of $\delta_m$ --- even its numerical value
 --- appears never to have been determined. Here we determine it
 numerically with certified lattice computations, identify its mechanism,
-prove the structural theorems that reduce the upper-bound problem to a
-single isolated arithmetic statement, and certify that statement's inputs
---- with all numerical error accounted --- on the full frequency window
-at fixed levels $m\le 256$. Our results are of four
+prove the structural theorems that reduce the upper-bound problem to one
+isolated arithmetic hypothesis plus finitely decidable band-rate inputs,
+and certify the latter --- with all numerical error accounted --- on the
+full frequency window at fixed levels $m\le 256$. Our results are of four
 kinds, and we keep the four statuses --- \emph{theorem},
 \emph{computational fact} (exact or certified computation),
-\emph{conditional theorem}, and \emph{conjecture} --- explicitly labeled
+\emph{conditional proposition}, and \emph{conjecture} --- explicitly labeled
 throughout.
 
 \subsection*{Theorems} (i) Since $2$ is a primitive root mod $3^m$, every
@@ -121,7 +121,7 @@ expresses $g_m$ in terms of shorter chains, with the certified kernel
 bound $|F(d,r)|\le 2^{-r}\delta_{d-1}$ and an exact identification of the
 phase-free region with the characteristic function of the real Syracuse
 variable (Theorem~\ref{thm:renorm}). (iii) A weighted contraction lemma:
-with weight $2^{\lambda u}$ in the coordinate $u=k-m\log_2 3$, the
+with weight $2^{-\lambda u}$ in the coordinate $u=k-m\log_2 3$, the
 phase-free weighted row sum equals $f(\lambda)=3^{\lambda}/(2^{1+\lambda}-1)$,
 and
 \[
@@ -135,7 +135,7 @@ exactly the conjectured rate, so the upper-bound problem reduces to the
 near-line and above-line frequencies. (iv) The real Syracuse variable is a
 Kesten chain whose Kesten equation $\E[(3\cdot 2^{-a})^{\kappa}]=1$ holds
 at $\kappa=1$ \emph{exactly} (the identity $3=2^2-1$), placing it at the
-Cauchy-type boundary with log-periodic corrections
+Cauchy-type boundary, $\Prob(Y>t)\sim C/t$ with $C=1/\log(27/16)$
 (Theorem~\ref{thm:kesten}). (v) An exact $2$-adic law on full periods: the
 identity $\nu_2(r(K))\ge\sigma\iff |r(K-\sigma)|\le M/2^{\sigma+1}$ for
 signed residues $r(K)$ of $2^K$ mod $M=3^m$ converts $2$-adic valuation
@@ -143,17 +143,20 @@ into Archimedean size, and yields that within any symmetric ball the
 valuation law over a full period is geometric with explicit error
 (Theorem~\ref{thm:cstat}).
 
-\subsection*{Conditional theorem} Assembling (i)--(v) with a
-capped weighted-$\ell^1$ bookkeeping (audited exactly on all $399$
-computed levels, with zero violations) and sharp product bounds along
-Tao's two-dimensional update process, we obtain a complete proof
-architecture for
+\subsection*{Conditional proposition} Assembling (i)--(v) with a
+capped weighted-$\ell^1$ bookkeeping on the frequency window (audited
+exactly on all $399$ one-step inequalities between consecutive computed
+levels, with zero violations) and sharp product bounds along Tao's
+two-dimensional update process, we obtain a proof architecture for
 \[
-\delta_m\;\le\;\mathrm{poly}(m)\cdot 2^{-0.0504\,m}
+\delta_m\;\le\;\mathrm{poly}(m)\cdot 2^{-r\,m},\qquad r>0.045,
 \]
 --- the qualitative form of the improvement flagged in \cite{Tao2022} ---
-whose \emph{single} unproven input (Hypothesis~\ref{hyp:clocal}) is a
-local equidistribution statement: entries of the orbit
+with two unproven inputs. One is a set of band-rate estimates (BR) for
+the product bounds, which are decidable on any finite set of frequencies
+and which we certify on the full extended window for $m\le 256$
+(Section~\ref{sec:instances}); the other (Hypothesis~\ref{hyp:clocal})
+is a local equidistribution statement: entries of the orbit
 $\{2^e\bmod 3^n\}$ into a short symmetric interval have geometrically
 decaying $2$-adic valuations, uniformly over windows of length
 $O(\log q)$, $q=3^n$. We show (Section~\ref{sec:cond}) that this
@@ -169,13 +172,15 @@ give: full-frequency scans for $m\le 15$; rescaled window computations to
 $m=1200$ showing that the extremal frequency exponent satisfies
 $k^*=m\log_2 3-(7.0\pm0.3)$ with the deficit \emph{constant} over
 $m=200$--$1200$, and a decay rate in $[0.0790, 0.0800]$ bits per level
-approaching $I_0$ one-sidedly; a boundary-layer structure theory
+consistent with $I_0=0.07932$; a boundary-layer structure theory
 (Section~\ref{sec:mech}); and certified instances on the full extended
 frequency window at $m=64$, $128$, $256$: unconditionally
 $\sup_{k\in W_m}|g_m(2^k)|\le 2^{-4.97},\ 2^{-8.4},\ 2^{-15.0}$
-respectively, and the band-rate inputs of the conditional theorem hold on
-$W_m$ with positive slack at rates $0.0350$, $0.0406$, $0.0457$ increasing
-toward $0.0504$ (Section~\ref{sec:instances}). Statements about
+respectively, and the band-rate inputs (BR) hold on $W_m$ outside the
+critical strip with positive slack at rates $0.0350$, $0.0406$, $0.0457$
+--- a rate that plateaus at $0.0457$ from $m=192$ on, the product-bound
+rates near the window edge extrapolating to $\approx 0.049$
+(Section~\ref{sec:instances}). Statements about
 $\delta_m$ itself at fixed $m$ additionally require the extremal frequency
 to lie in $W_m$, which is verified exhaustively for $m\le 15$.
 
@@ -213,7 +218,7 @@ made precise in \cite[\S1]{Tao2022}; the stationary law of
 \begin{enumerate}
 \item[(a)] $2$ is a primitive root mod $3^m$ for every $m\ge 1$:
   $\ord(2 \bmod 3^m)=2\cdot 3^{m-1}=|(\Z/3^m\Z)^{\times}|$.
-\item[(b)] Consequently every $\xi$ with $3\nmid\xi$ is $\pm$ a power of
+\item[(b)] Consequently every $\xi$ with $3\nmid\xi$ is a power of
   $2$ mod $3^m$, and with
   $g_m(k):=\E\,\e\!\bigl(2^{k}\,\mathbf{Syrac}/3^m\bigr)$ (exponents read
   mod $\ord(2)$) one has $\delta_m=\max_k |g_m(k)|$ and the exact lattice
@@ -296,7 +301,7 @@ For all $m,k$:
   \]
   obtained by splitting at the first step where the valuation sum
   exceeds $k$.
-\item[(c)] (kernel bound) $|F(d,r)|\le 2^{-r}\,\delta_{d-1}$.
+\item[(c)] (kernel bound) $|F(d,r)|\le 2^{-r}\,\delta_{d-1}$ for $d\ge 2$.
 \end{enumerate}
 \end{theorem}
 
@@ -339,7 +344,9 @@ Write $\alpha=\log_2 3$ and use the line coordinate $u=k-m\alpha$.
 
 \begin{theorem}[weighted contraction]\label{thm:weight}
 For $\lambda>-1$ define the phase-free weighted row sum of the recursion
-\eqref{eq:rec} with weight $2^{\lambda u}$:
+\eqref{eq:rec} with weight $2^{-\lambda u}$ (so that $\lambda^*>0$ below
+corresponds to a weight decaying above the line, matching the convention
+$\mu=-\lambda^*$ of \eqref{eq:rmu}):
 \[
 f(\lambda)\;=\;\sum_{a\ge 1}2^{-a}\,2^{\lambda(\alpha-a)}
 \;=\;\frac{3^{\lambda}}{2^{1+\lambda}-1}.
@@ -355,7 +362,7 @@ I_0=\frac{1-H(\theta)}{\theta},\qquad
 
 Applying the weight to \eqref{eq:rec} and bounding phases by $1$
 wherever the weight decays, one obtains for the weighted norm
-$\|g_m\|_{\lambda}=\sup_k 2^{\lambda u}|g_m(k)|$ the one-step inequality
+$\|g_m\|_{\lambda}=\sup_k 2^{-\lambda u}|g_m(k)|$ the one-step inequality
 $\|g_m\|_{\lambda}\le f(\lambda)\|g_{m-1}\|_{\lambda}+(\text{boundary
 terms supported near and above } u=0)$: with no phase input at all, the
 below-line region contracts at exactly the conjectured rate, and the
@@ -400,20 +407,29 @@ run with a \emph{free} weight exponent. For $\mu<0$ define
 \begin{equation}\label{eq:rmu}
 r(\mu)\;=\;\mu\,\alpha+\log_2\!\bigl(2^{\,1-\mu}-1\bigr),
 \end{equation}
-the contraction rate of the capped weighted-$\ell^1$ functional
-$N_{\mu}(m)=\sum_k \min\bigl(2^{\mu u},\,1\bigr)\,|g_m(k)|$; one checks
+the contraction rate of the capped weighted-$\ell^1$ \emph{window}
+functional
+\[
+N_{\mu}(m)=\sum_{k\in W_m}\min\bigl(2^{\mu u},\,1\bigr)\,|g_m(k)|,
+\]
+$W_m$ the extended window of Section~\ref{sec:instances}; one checks
 $\max_{\mu}r(\mu)=I_0$ at $\mu=-\lambda^*$, and smaller $|\mu|$ trades
-rate for weaker demands on the above-line frequencies. The functional
-$N_\mu$ has no above-line escape route: the weight decays upward, and,
-unlike the sup norm, the $\ell^1$ sum sees every frequency.
+rate for weaker demands on the frequencies below the window. The index set
+must be a window: summed over all of $\mathbb Z$ the functional diverges
+by periodicity of $g_m$, and on a centered fundamental domain of the
+exponent circle it does not contract (the two levels have different
+periods), so the global formulation carries no content beyond the window
+one; frequencies entering the window from below are the band-rate inputs
+(BR) of Section~\ref{sec:cond}.
 
 \begin{compfact}[audited bookkeeping]\label{cf:audit}
-The one-step inequality $N_{\mu}(m)\le 2^{-r(\mu)}N_{\mu}(m-1)$ with
-$\mu=-0.16$, $r(\mu)=0.0504$, was audited against the exact lattice data
-on all $399$ computed levels: zero violations, with no injection terms
-required within the window. The remaining bookkeeping (seam and
-wrap-around of the exponent circle) is exactly the constraint system
-used in the certified instances of Section~\ref{sec:instances}.
+The one-step inequality $N_{\mu}(m)\le 2^{-r(\mu)}N_{\mu}(m-1)$ of the
+window functional with $\mu=-0.16$, $r(\mu)=0.0504$, was audited against
+the exact lattice data for all $399$ pairs of consecutive levels
+$2\le m\le 400$: zero violations, with no injection terms required within
+the window. The bookkeeping at the window boundary is exactly the
+constraint system (BR) used in the certified instances of
+Section~\ref{sec:instances}.
 \end{compfact}
 
 \section{Kesten structure of the real variable}\label{sec:kesten}
@@ -429,23 +445,32 @@ $\E[(3\cdot 2^{-a})^{\kappa}]=1$ holds \emph{exactly} at $\kappa=1$:
 =\sum_{a\ge 1}2^{-a}\cdot 3\cdot 2^{-a}
 =3\sum_{a\ge 1}4^{-a}=3\cdot\tfrac13=1 .
 \]
-The multiplier $\log(3\cdot 2^{-a})=\log 3-a\log 2$ is
-arithmetically lattice, and the Goldie conditions hold; hence
-$\Prob(Y>t)=h(\log t)/t\,(1+o(1))$ with $h$ log-periodic, $\E Y=\infty$,
-and the tail exponent is exactly $1$.
+The multiplier $\log(3\cdot 2^{-a})=\log 3-a\log 2$ takes its values
+in the shifted lattice $\log 3-(\log 2)\mathbb{Z}$, whose generated closed
+subgroup is dense because $\log 3/\log 2$ is irrational; its law is
+therefore \emph{non-arithmetic}, the Goldie conditions hold, and
+\[
+\Prob(Y>t)\sim\frac{C}{t},\qquad
+C=\frac{\E[2^{-a}]}{\E[3\cdot 2^{-a}\log(3\cdot 2^{-a})]}
+=\frac{1}{\log(27/16)}=1.91114\ldots,
+\]
+so $\E Y=\infty$ and the tail exponent is exactly $1$.
 \end{theorem}
 
 \begin{proof}
 The fixed-point equation restates the definition after one step. The
 Kesten computation at $\kappa=1$ is the displayed line ---
 $3^{\kappa}=2^{\kappa+1}-1$ has the integer solution $\kappa=1$ because
-$3=2^2-1$. The moment and lattice conditions of implicit renewal theory
-\cite{Kesten1973,Goldie1991} are immediate ($\E[(3\cdot2^{-a})\log^+(3\cdot2^{-a})]<\infty$),
-giving the tail with log-periodic prefactor in the lattice case.
+$3=2^2-1$. The moment condition of implicit renewal theory
+\cite{Kesten1973,Goldie1991} is immediate
+($\E[(3\cdot2^{-a})\log^+(3\cdot2^{-a})]<\infty$), and in the
+non-arithmetic case Goldie's theorem gives $\Prob(Y>t)\sim Ct^{-1}$ with
+$C=\E[B]/\E[A\log A]$ for $A=3\cdot 2^{-a}$, $B=2^{-a}$; here
+$\E[B]=1/3$ and $\E[A\log A]=\log 3-\tfrac43\log 2=\tfrac13\log(27/16)$.
 \end{proof}
 
 This places Syracuse at the \emph{boundary} Cauchy-type case: power
-corrections in $1/m$ and log-periodic constants are forced, which is
+corrections in $1/m$ are to be expected, which is
 exactly what the numerics of Section~\ref{sec:numerics} display, and the
 polynomial factor in Conjecture~\ref{conj:c1} should be regarded as this
 mechanism's signature rather than as numerical noise.
@@ -510,10 +535,10 @@ $2^{-\sigma}(1+O(2^{\sigma}/\varepsilon 3^m))$.
 \begin{remark}
 An independent derivation via Palm sampling of ball entries and a
 conductance comparison gives the same conclusion without the bijection.
-Exhaustive verification at $m=12$ over the full period and
-$\sigma\le 5$ found zero mismatches of Lemma~\ref{lem:val}, and the
-observed frequencies $0.4999,\,0.2501,\,0.1250,\,0.0624$ match the
-geometric law. We also note a caveat used below: value chains generated
+Exhaustive verification for $m\le 12$ over the full period and
+$\sigma\le 6$ found zero mismatches of Lemma~\ref{lem:val}, and the
+observed frequencies at $m=12$, $0.5000,\,0.2500,\,0.1250,\,0.0625$ (for
+both $\varepsilon=1/2$ and $\varepsilon=1/10$), match the geometric law. We also note a caveat used below: value chains generated
 by non-units (multiples of $9$) live on leaves of effective modulus
 $3^{m-2j+2}$, and Lemma~\ref{lem:val} is applied at the effective scale.
 \end{remark}
@@ -533,9 +558,10 @@ accompany the paper.
 \item[(b)] Rescaled lattice computations for $m\le 1200$: the extremal
   exponent satisfies $k^*=m\log_2 3-(7.0\pm 0.3)$, with the deficit
   constant over $m=200$--$1200$; the local decay rate of the window
-  maximum lies in $[0.0790,\,0.0800]$ bits/level and approaches
-  $I_0=0.07932$ from above, consistent with a polynomial correction.
-\item[(c)] The one-sided nature of (b) matches the theory: weighted
+  maximum lies in $[0.0790,\,0.0800]$ bits/level, straddling
+  $I_0=0.07932$ within the measurement resolution, consistent with a
+  polynomial correction.
+\item[(c)] Only one side of (b) is accessible to the theory: weighted
   contraction (Theorem~\ref{thm:weight}) can only prove rate $\ge I_0-\epsilon$
   statements for the certified functionals, and the tilted optimum
   behaves as $\Geom(\theta)$.
@@ -551,8 +577,11 @@ The caveat that a window computation might miss a distant frequency
 among the $\sim 10^{286}$ at $m=600$ is answered structurally: the
 $\ell^4$ functional $S_4'(m)=\sum_{3\nmid\xi}|\E\e(\xi X/3^m)|^4$ is a
 \emph{computable global scalar} --- an FFT sees every frequency --- with
-the collision representation
-$S_4'(m)=3^m\,\Prob(X_1+X_2\equiv X_3+X_4 \bmod 3^m)$; exact computation
+the collision representation (with $Z=X_1+X_2-X_3-X_4$ for four
+independent copies)
+$S_4'(m)=3^m\,\Prob(Z\equiv 0 \bmod 3^m)-3^{m-1}\,\Prob(Z\equiv 0 \bmod 3^{m-1})$,
+the subtracted term removing the frequencies divisible by $3$; exact
+computation
 for $m\le 13$ shows $Q(m)=S_4'/\delta_m^4$ saturating at $\approx 18$, so
 the fourth moment is concentrated on the extremal ridge and
 $\delta_m=(S_4'/Q)^{1/4}$. The four-fold weighted row sum factorizes
@@ -606,7 +635,7 @@ line that governs the nontrivial-cycle problem --- with amplitude carried
 by a single pinned crossing and only polynomial phase loss. The two
 remaining asymptotic lemmas are stated in Section~\ref{sec:conj}.
 
-\section{Toward unconditional exponential decay: the conditional theorem}
+\section{Toward unconditional exponential decay}
 \label{sec:cond}
 
 \subsection{Literature status}
@@ -638,11 +667,21 @@ below $\varepsilon 3^d$) is the literal small-integer main triangle.
 \end{lemma}
 
 \begin{lemma}[pair spacing]\label{lem:pair}
-Two seeds of depth $h$ (i.e.\ chains reaching $\nu_2\ge h$) in the same
-row are separated by at least $2\alpha h-\log_2((1+\varepsilon)/\varepsilon)$
-positions. (Cross-ratio argument on $t\neq 0$ intersections; this is the
-explicit quantitative form of the separation of large triangles.)
+Let $w_1,w_2$ be the odd seeds of two chains of depth $\ge h$ (i.e.\
+chains reaching $\nu_2\ge h$, so $|w_i|\le\varepsilon 3^d/2^h$) in the
+same row, at positions $e_1<e_2$. Then
+\[
+e_2-e_1\ \ge\ \log_2\!\Bigl(\frac{2^h}{\varepsilon}-1\Bigr)
+\ \ge\ h+\log_2(1/\varepsilon)-1 .
+\]
 \end{lemma}
+
+\begin{proof}
+Put $\Delta=e_2-e_1\ge 1$. Then $2^{\Delta}w_1\equiv w_2\pmod{3^d}$ and
+$2^{\Delta}w_1\ne w_2$ (one side is even, the other odd), so
+$|2^{\Delta}w_1|+|w_2|\ge 3^d$; with $|w_i|\le\varepsilon 3^d/2^h$ this
+gives $(2^{\Delta}+1)\varepsilon/2^h\ge 1$, which is the claim.
+\end{proof}
 
 \begin{lemma}[$2$-adic exhaustion, probabilistic form]\label{lem:exhaust}
 Within a black chain, continuation requires $b_j\le\nu_2(v)$ and the
@@ -655,14 +694,13 @@ hypothesis below.
 \end{lemma}
 
 Lemma~\ref{lem:r1a} is proved by the displayed inequality
-($|2v|\le 3^d/2$ precludes reduction); Lemma~\ref{lem:pair} is a
-four-line cross-ratio argument; Lemma~\ref{lem:exhaust} combines the
+($|2v|\le 3^d/2$ precludes reduction); Lemma~\ref{lem:exhaust} combines the
 budget bound with the measured re-seeding rate (the deterministic-exit
 claim for all $b$ is \emph{false} --- an explicit counterexample at
 $m=7$, $v=-13$, $b=7$ exists --- which is why the run-length control is
 routed through the entry-valuation hypothesis).
 
-\subsection{The single remaining input}
+\subsection{The remaining inputs}
 
 \begin{hypothesis}[local entry-valuation bound; ``Lemma C-local'']
 \label{hyp:clocal}
@@ -692,23 +730,21 @@ The pair-spacing lemma does yield an unconditional statement: along a
 monotone segment of length $L$ the walk enters each chain at most once,
 an entry of valuation $\ge h$ lies in a chain of depth $\ge h$, and
 Lemma~\ref{lem:pair} bounds the number of such chains by
-$L/(2\alpha h-c)+1$; summing over $h$,
+$L/(h+\log_2(1/\varepsilon)-1)+1$; summing over $h$,
 \[
 \sum_{\text{entries}}\nu_2(v_{\mathrm{entry}})\;\le\;
-\frac{L}{2\alpha}\bigl(\ln h_{\max}+O(1)\bigr)+h_{\max},
+L\bigl(\ln h_{\max}+O(1)\bigr)+h_{\max},
 \qquad h_{\max}\le\log_2(\varepsilon 3^d),
 \]
 deterministically. This is exactly the shape of the logarithmic loss:
-the implied bound on black steps, $(L/4\alpha)(\ln h_{\max}+O(1))$,
-exceeds $L$ once $d\gtrsim 250$, so it guarantees no white points
+the implied bound on black steps, $(L/2)(\ln h_{\max}+O(1))$,
+exceeds $L$ already for small $d$, so it guarantees no white points
 asymptotically, and a per-entry average of order $\log d$ follows only
 when the number of entries is itself of order $L$ --- which is again an
 equidistribution input. Thus Lemma~\ref{lem:pair} cannot replace
 Hypothesis~\ref{hyp:clocal}: it controls the \emph{population} of deep
 chains but not their occupation by the walk, and the geometric depth law
-is precisely the missing ingredient. (A saturated population allowed by
-the lemma realizes the $\sim 0.6\log_2 d$ per-entry average
-numerically.)
+is precisely the missing ingredient.
 \end{remark}
 
 \subsection{Classification of the hypothesis}
@@ -733,17 +769,23 @@ Section~\ref{sec:instances} exploits.
 
 \subsection{The conditional theorem}
 
-\begin{theorem}[conditional exponential decay]\label{thm:conditional}
-Assume Hypothesis~\ref{hyp:clocal}. Then the sharpened product bounds
-along Tao's update process (all-$b$ dynamic program) admit uniform band
-rates $a(\delta)$ --- $\delta=|k-m\alpha|/m$ the relative distance to
-the line --- that close the capped weighted-$\ell^1$ constraint system
-of Section~\ref{sec:weight} at $\mu=-0.16$ with positive slack in every
-band. Consequently
-\[
-\delta_m\;\le\;C\,\mathrm{poly}(m)\;2^{-r m},\qquad r=0.0504\ \text{bits/level}.
-\]
-\end{theorem}
+\begin{proposition}[conditional exponential decay]\label{thm:conditional}
+Assume Hypothesis~\ref{hyp:clocal}, and assume the band-rate estimates
+\begin{itemize}
+\item[(BR)] for some $\mu<0$ and all $m$, the sharpened product bounds
+  along Tao's update process (all-$b$ dynamic program) satisfy
+  $|g_m(2^k)|\le 2^{-a(\delta)m}$ with $a(\delta)\ge r(\mu)+|\mu|\delta$,
+  $\delta=|k-m\alpha|/m$, for every frequency outside the critical strip
+  $-8\le k-m\alpha\le 2$ of the window, and $a\ge 0.25$ at the seam.
+\end{itemize}
+Then $\delta_m\le C\,\mathrm{poly}(m)\,2^{-r(\mu)m}$. Numerically, (BR)
+is certified on the extended window with $\mu=-0.14$ ($r=0.0457$) at
+$m=192$ and $256$ (Theorem~\ref{thm:instances}); the value $\mu=-0.16$
+($r=0.0504$) obtained from rates sampled at $m=240$ is not stable under
+finer sampling in $m$, and the certified product-bound rates near the
+window edge extrapolate to $\approx 0.049$ (Remark~\ref{rem:instscope}),
+so we claim only $r>0.045$.
+\end{proposition}
 
 \begin{proof}[Proof architecture]
 Hypothesis~\ref{hyp:clocal}, with Lemmas~\ref{lem:r1a}--\ref{lem:exhaust},
@@ -752,30 +794,32 @@ tails along every wrapped segment; hence the number of white points is
 linear in the segment length, at every effective scale, and the octave
 sum converges (removing the logarithmic divergence responsible for
 Tao's $m^{-A}$). This yields the uniform lower bounds on the band rates
-$a(\delta)$ computed by the all-$b$ product DP; the measured rates
-(stable in $m$ at $240$ and $320$) are: ridge $0.060$--$0.078\le I_0$
-(consistency check), wrap side $0.094$--$0.17$, below-line
-$0.0633/0.0810/0.108$ at $\delta=0.05/0.15/0.30$, seam $\approx 0.33$.
-Optimizing the free weight over $\mu$ against the constraint
-$r(\mu)+|\mu|\delta\le a(\delta)$ for all bands outside the critical
-window yields $\mu=-0.16$ with slack $+0.005$--$0.030$ in every band and
-rate $r(\mu)=0.0504$ by \eqref{eq:rmu}. The capped functional's one-step
-contraction at this rate is the audited inequality of
-Computational Fact~\ref{cf:audit}; the seam and circle-wraparound
-bookkeeping close with the seam rate $0.33\gg r$. Summing the one-step
+$a(\delta)$ computed by the all-$b$ product DP --- this is where (BR)
+enters as an input rather than a consequence: the rates sampled at
+$m=240$ and $320$ (ridge $0.060$--$0.078\le I_0$ as a consistency check,
+wrap side $0.094$--$0.17$, below-line $0.0633/0.0810/0.108$ at
+$\delta=0.05/0.15/0.30$, seam $\approx 0.33$) close the constraint
+$r(\mu)+|\mu|\delta\le a(\delta)$ at $\mu=-0.16$, but the certified
+full-window computations of Section~\ref{sec:instances} close it only at
+$\mu=-0.14$ for $m\le 256$, with the shoulder band binding. Given (BR),
+the capped window functional's one-step contraction at rate $r(\mu)$ is
+the audited inequality of Computational Fact~\ref{cf:audit}, the seam and
+below-window terms are controlled by (BR), and summing the one-step
 inequalities gives the claim.
 \end{proof}
 
 \begin{remark}
-The division of labor is exact: every step of the architecture is either
-proved (Theorems~\ref{thm:onedim}--\ref{thm:cstat},
-Lemmas~\ref{lem:r1a}--\ref{lem:pair}), audited exactly
-(Computational Fact~\ref{cf:audit}), or measured with stated margins
-(the band rates); Hypothesis~\ref{hyp:clocal} is the sole unproven
-input, and Theorem~\ref{thm:cstat} proves its full-period form. We do
-not currently see how to prove the windowed form, and we flag it as the
-precise obstruction --- in our view a more tractable target than the
-Collatz conjecture itself, but of the $\times 2\times 3$ family.
+The division of labor is explicit: every step of the architecture is
+either proved (Theorems~\ref{thm:onedim}--\ref{thm:cstat},
+Lemmas~\ref{lem:r1a}--\ref{lem:pair}), audited on the window
+(Computational Fact~\ref{cf:audit}), or an input --- Hypothesis
+\ref{hyp:clocal} and the band-rate estimates (BR). Theorem~\ref{thm:cstat}
+proves the full-period form of the former; (BR) is certified level by
+level in Section~\ref{sec:instances} but not proved uniformly in $m$. We
+do not currently see how to prove the windowed form of the hypothesis,
+and we flag it as the precise obstruction --- in our view a more tractable
+target than the Collatz conjecture itself, but of the $\times 2\times 3$
+family.
 \end{remark}
 
 \section{Certified instances on the window}\label{sec:instances}
@@ -807,29 +851,40 @@ m=256: & 525\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-15.0}, &
 \end{array}
 \]
 Here the window supremum bound is unconditional, and the last two columns
-state that the band-rate inputs of Theorem~\ref{thm:conditional} hold on
-$W_m$ at the given $(\mu,r(\mu))$ with the stated minimal slack (zero
-safety margin: all numerical error is inside $U_m$).
+state that the band-rate estimates (BR) hold on $W_m$ outside the critical
+strip $-8\le u\le 2$ (which the row-sum identity handles) at the given
+$(\mu,r(\mu))$ with the stated minimal slack (zero safety margin: all
+budgeted numerical error is inside $U_m$).
 \end{theorem}
 
 \begin{remark}[scope]\label{rem:instscope}
-(i) The certified rate of the constraint system increases toward the
-conditional rate $0.0504$ ($0.0350\to0.0406\to0.0457$, one doubling at a
-time), with the binding constraints stabilizing in the shoulder band
-$u\in[-13,-9]$ --- the same band the asymptotic analysis identifies as
-the precision zone; we regard this as structural corroboration of the
-inputs of Theorem~\ref{thm:conditional}. (ii) Under window localization
+(i) Finer sampling in $m$ shows that the certified constraint rate has
+already plateaued: $\mu=-0.10,-0.11,-0.12,-0.13,-0.14,-0.14$ at
+$m=64,96,128,160,192,256$ ($r=0.0350,0.0379,0.0406,0.0432,0.0457,0.0457$),
+with the binding constraints in the shoulder band $u\in[-13,-9]$. The
+certified window rates fit $a_{\min}(m)=0.0491+0.31\log_2 m/m$ to within
+$10^{-4}$ over $m=64$--$256$ (shoulder band: $0.048+0.40\log_2 m/m$), so the product-bound rates near the window edge
+extrapolate to $\approx 0.048$--$0.049$, below $r(-0.16)=0.0504$; the
+$(\log_2 m)/m$ correction is the finite-size trace of the logarithmic loss
+that Hypothesis~\ref{hyp:clocal} is meant to remove. Whether the sampled
+rate $0.0504$ is attainable by this bookkeeping is therefore open, and we
+do not claim it. (ii) Under window localization
 of the extremal frequency, $\delta_m=\sup_{W_m}|g_m|$ and the exact window
 computation gives the much smaller true value
 (e.g.\ $\log_2\delta_{256}\approx-30.7$); the product bound is the
 \emph{certifiable} envelope, not the truth. (iii) The error accounting:
-the step law is truncated at $b\le 40$ and the omitted mass is added as
-$(m/2)\sum_{b>40}(b-1)2^{-b}$ (union bound, $|f|\le 1$); pruned dynamic
-program states are added back at their true scale (future factors are at
-most $1$); each $|f|$ receives $+10^{-11}$ and the total a factor
-$1+10^{-8}$, both exceeding the floating-point error by more than two
-orders of magnitude. The certified numbers reproduce the unaccounted
-floating-point ones to within $10^{-4}$ in rate.
+the step law is truncated at $b\le B(m)$, $B=41,65,112$ for
+$m=64,128,256$, chosen so that the omitted mass
+$(m/2)\sum_{b>B}(b-1)2^{-b}$ (union bound, $|f|\le 1$) is below
+$2^{-0.35m-8}$; pruned dynamic program states are added back at their true
+scale (future factors are at most $1$), with an $m$-adaptive threshold
+$2^{-0.4m-40}$; each $|f|$ receives $+10^{-11}$ and the total a factor
+$1+10^{-8}$. The two allowances are \emph{budgeted}, not
+interval-certified: they exceed by more than two orders of magnitude the
+error implied by $\le 1$\,ulp accuracy of the library sine and cosine on
+reduced arguments and by the operation counts of the dynamic program. The
+certified numbers reproduce the unaccounted floating-point ones to within
+$10^{-4}$ in rate.
 \end{remark}
 
 \section{The sharp-rate conjecture and the three clocks}\label{sec:conj}
@@ -844,7 +899,7 @@ norms).
 Two asymptotic lemmas would upgrade the numerical support to a proof of
 the corresponding bounds, and we state them precisely:
 \[
-(\mathrm{L}\alpha)\ \ \sup_{k\ge m\alpha+O(1)}|g_m(k)|\le 2^{-I_0m+o(m)}
+(\mathrm{L}\alpha)\ \ \sup_{k\ge m\alpha+C_0}|g_m(k)|\le 2^{-I_0m+o(m)}\ \text{for some constant } C_0
 \qquad\quad
 (\mathrm{L}\beta)\ \ \bigl|\E_{\mathrm{tilt}}\,\e(\Phi_m)\bigr|\ \ge\ 1/\mathrm{poly}(m)
 \]
@@ -1025,10 +1080,11 @@ main-term (positivity-based) lower-bound construction was rejected by
 its own criterion (measured rate $I_0+0.0093$, below target), leading
 to the crossing-term mechanism of Section~\ref{sec:mech}. (3) The
 pre-registered two-sided band $[0.0790,0.0797]$ for the asymptotic rate
-was replaced by the one-sided criterion (rate $\ge I_0-\epsilon$,
+was \emph{not} met (the measured range is $[0.0790,0.0800]$). After
+seeing the data we adopted a one-sided criterion (rate $\ge I_0-\epsilon$,
 approaching $I_0$), on the structural ground that certified functionals
-bound the rate from one side only; current data satisfy the one-sided
-criterion. We keep this log because, in our experience, the two
+bound the rate from one side only; the data satisfy that criterion, but
+this is a post-hoc replacement and we record it as such. We keep this log because, in our experience, the two
 rejections were the direct source of the mechanism results in
 Section~\ref{sec:mech}.
 
