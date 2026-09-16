@@ -67,7 +67,7 @@ forms in logarithms; machine-verified proof.
 \noindent\textbf{2020 Mathematics Subject Classification:} Primary 11B83;
 Secondary 68R15, 03F20, 11J86.
 
-\noindent\textbf{Word count:} approximately 6{,}300 words.
+\noindent\textbf{Word count:} approximately 6{,}600 words.
 
 \section{Introduction}\label{sec:intro}
 
@@ -79,7 +79,12 @@ has resisted every known technique; see the surveys of Lagarias
 extends to all $n<2^{68}$ \cite{Barina2021}; almost every integer (in
 natural density) descends below itself, by Terras \cite{Terras1976} and
 Everett \cite{Everett1977}; and Tao \cite{Tao2022} proved that almost all orbits (in logarithmic
-density) attain almost bounded values.
+density) attain almost bounded values. Concurrently with and independently
+of the present work, Sharpe \cite{Sharpe2026} has machine-verified in
+Lean~4 a no-go theorem for \emph{bounded-window} descent certificates
+together with Terras's theorem in finite form; the relation to our
+results is discussed in Remarks~\ref{rem:thmA}, \ref{rem:countnum} and
+\ref{rem:sturmrelated}.
 
 Faced with such a problem, the strategy that nearly every newcomer --- and
 many published attempts --- adopt is the same folk recipe: split the
@@ -391,10 +396,19 @@ climbing classes have density $c(K)/2^K\ge 2^{-K}$
 Claim (b) follows from Theorem~B and Corollary~\ref{cor:density}.
 \end{proof}
 
-\begin{remark}
+\begin{remark}\label{rem:thmA}
 Theorem~A is machine-verified in an abstract certificate-system
 formulation, with the count rendered as an injection from climbing
 classes into deep certificates (Section~\ref{sec:artifacts}).
+Sharpe's no-go theorem \cite{Sharpe2026} excludes, by the same all-ones
+mechanism (the integers $2^L-1$ shadow the $2$-adic fixed point $-1$),
+every scheme whose potential is $n\,W(n)$ with $W$ bounded above and
+below and whose descent window is uniformly bounded --- the regime of a
+\emph{finite} computation. Theorem~A addresses the complementary regime
+of unbounded depth and quantifies it: the frontier width
+$c(k)=2^{H(\theta)k+o(k)}$, its robustness under disjunction and adaptive
+stopping (Theorem~A$'$), and its Sturmian and non-regular structure
+(Theorems~C--E) have no counterpart in the bounded-window statement.
 The proof uses nothing about the internal structure of the certificates
 beyond Lemmas~\ref{lem:nocert} and \ref{lem:locality}; in particular it
 applies verbatim to systems mixing arbitrary depths, refining by odd
@@ -605,14 +619,24 @@ $\beta_j/(2^j-3^{e_j})$ is $24.54$ at $j=8$), with spikes at the depths
 where $2^j$ is unusually close to a power of $3$ from above (e.g.\
 $j=8$: $2^8/3^5=256/243$, the Pythagorean limma) --- the same
 continued-fraction structure observed for paradoxical ratios in
-\cite{Niu2026}. (ii) The recent literature enumerates paradoxical
-\emph{windows} \cite{Niu2026} and shows that finiteness of the set of
-paradoxical sequences implies the conjecture
-\cite[Cor.~3.3]{RozierTerracol2026}; a power-saving count of the
-non-descending set $\mathcal{E}$ itself does not appear there, nor
-anywhere else we could locate (in particular not in the annotated
-bibliographies of Lagarias). The bound is a routine consequence of the
-present framework, and we state it with that caveat. (iii) The shadow
+\cite{Niu2026}. (ii) The argument of the corollary is Terras's \cite{Terras1976}: the
+parity vector of length $m$ is a bijection on $(M,2M]$, and non-descent
+forces a supercritical density of odd steps. Terras's theorem in this
+finite form was recently machine-verified by Sharpe \cite{Sharpe2026},
+with the explicit bound
+$\#\{n\in[2^k,2^{k+1}):\text{no descent within } k \text{ steps}\}
+\le 3^k/2^{\lfloor 17(k-1)/27\rfloor}\approx 2^{0.955k}$, where the
+rational approximation $3^{17}\le 2^{27}$ replaces the entropy function;
+the corollary sharpens the exponent to the exact entropy value
+$H(\theta)=0.94996\ldots$ with an absolute constant and identifies it
+with the certificate growth rate $\gamma$. The recent parity-vector
+literature enumerates paradoxical \emph{windows} \cite{Niu2026} and shows
+that finiteness of the set of paradoxical sequences implies the
+conjecture \cite[Cor.~3.3]{RozierTerracol2026}. We are not aware of a
+stated count of $\mathcal{E}$ with the exponent $H(\theta)$, but the
+bound is a routine consequence of Terras's method, and we state it with
+that caveat; its combinatorial core is machine-verified
+(Section~\ref{sec:artifacts}). (iii) The shadow
 method is exhausted at the exponent $H(\theta)$:
 the set of integers in $(M,2M]$ satisfying all depth-$m$ congruence
 necessary conditions has exactly $c(m)$ elements, so no argument using
@@ -856,7 +880,12 @@ of a hypothetical cycle. Their extremal role there and the driving role of
 the characteristic Sturmian word here (Theorems~C--D) are distinct
 phenomena with a common source: the affine functional $3^{e}/2^{j}$ is
 extremized under balance constraints governed by the continued fraction of
-$\log_2 3$.
+$\log_2 3$. In the machine-verified setting, Sharpe \cite{Sharpe2026}
+excludes specific mechanical (Sturmian) parity itineraries of slopes above
+the critical line --- slope $1/\sqrt2$ and an explicit metallic family ---
+as itineraries of actual orbits; that is a statement about orbits, whereas
+Theorems~C--E concern the frontier of certificate systems, whose slope is
+the critical $\theta$ itself.
 \end{remark}
 
 \begin{conjecture}\label{conj:precursive}
@@ -1043,14 +1072,35 @@ compiled with core Lean only (no external libraries), toolchain pinned to
   with $\binom{k}{e}$ goes through indicator vectors of
   \texttt{Finset.powersetCard}. Axioms within \texttt{[propext,
   Classical.choice, Quot.sound]}; no \texttt{sorry}.
+\item \texttt{CountingCorollary.lean} (same Lake project): \emph{the
+  combinatorial core of Corollary~\ref{cor:count}}. With $T$ the
+  compressed map and \texttt{stays m n} the predicate ``the first $m$
+  iterates stay $\ge n$'' (which contains $\mathcal{E}\cap(2^m,2^{m+1}]$),
+  \texttt{growth\_ineq} proves the integer form
+  $2^{m(e+1)}\le(3\cdot 2^m+1)^e$ of $e\ge m\theta_M$ for $n>2^m$,
+  \texttt{parityset\_injective} proves the Terras injectivity of
+  $n\mapsto\{i<m: T^i n \text{ odd}\}$ on $(2^m,2^{m+1}]$ via the affine
+  difference identity $2^j(T^jn-T^jn')=3^{e_j}(n-n')$, and
+  \texttt{count\_le} concludes
+  $\#\{n\in(2^m,2^{m+1}]:\texttt{stays}\}\le\sum_{e}\binom{m}{e}$ over the
+  admissible $e$. Only the entropy estimate
+  $\sum_{e\ge pm}\binom me\le 2^{mH(p)}$ and the passage from the integer
+  inequality to $\theta_M$ are left to the text. Axioms within
+  \texttt{[propext, Classical.choice, Quot.sound]}; no \texttt{sorry}.
 \end{itemize}
 Of the main results, Theorem~A (modulo the trivial reading of an
-injection as a statement about distinct classes) and the binomial
-sandwich of Theorem~B are thus machine-verified, while the entropy limit
+injection as a statement about distinct classes), the binomial
+sandwich of Theorem~B, and the combinatorial core of
+Corollary~\ref{cor:count} are thus machine-verified, while the entropy limit
 in Theorem~B (Fekete and Stirling) and the remaining steps of A$'$, as
 well as Theorems~C--G, are verified by conventional proof plus the
-independent computations described above. The three core files use no library at all and can be
-checked in seconds; the Theorem~B project requires a Mathlib cache.
+independent computations described above. The three core files use no
+library at all and can be checked in seconds; the Mathlib project requires
+a Mathlib cache. Both toolchains used (\texttt{v4.32.2}, released
+2026-07-28, and \texttt{v4.33.1}) postdate the fix for the Lean kernel
+soundness issue \#14576 of July 2026, which in any case was reachable only
+through metaprogrammed kernel submissions; the artifacts use no
+metaprogramming.
 
 \subsection{Reproducibility and data availability}
 All computations use exact integer (or exact rational) arithmetic. The
@@ -1076,6 +1126,7 @@ artifact & SHA-256\\
 \texttt{Counting.lean} & \texttt{09619f3b7862934a14ef7fb9ed9d4646}\\
  & \texttt{a50ea425a4622f819acf27bded5a4396}\\
 \texttt{TheoremB.lean} & \texttt{0b2f7f732e6e42dc45624531a3e5c05a}\\
+\texttt{CountingCorollary.lean} & \texttt{eb05554941149f2930d3579a984106b3}\\
  & \texttt{8847c88912e3ed3321a716dd8fd3879a}\\
 \bottomrule
 \end{tabular}
@@ -1268,6 +1319,13 @@ arXiv:2607.24844 (2026).
 K.~Knight,
 \emph{Collatz high cycles do not exist},
 Discrete Math. \textbf{349} (2026), no.~3, art.~114812.
+
+\bibitem{Sharpe2026}
+M.~Sharpe,
+\emph{The Collatz conjecture at the critical line: machine-verified no-go,
+density, and cycle theorems},
+preprint and Lean~4 development (June 2026),
+\url{https://github.com/msharpe248/collatz}.
 
 \bibitem{Lothaire2002}
 M.~Lothaire,

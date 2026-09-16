@@ -1,1 +1,2 @@
 import CollatzLean.TheoremB
+import CollatzLean.CountingCorollary
