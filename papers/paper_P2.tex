@@ -174,12 +174,12 @@ $k^*=m\log_2 3-(7.0\pm0.3)$ with the deficit \emph{constant} over
 $m=200$--$1200$, and a decay rate in $[0.0790, 0.0800]$ bits per level
 consistent with $I_0=0.07932$; a boundary-layer structure theory
 (Section~\ref{sec:mech}); and certified instances on the full extended
-frequency window at $m=64$, $128$, $256$: unconditionally
-$\sup_{k\in W_m}|g_m(2^k)|\le 2^{-4.97},\ 2^{-8.4},\ 2^{-15.0}$
+frequency window at $m=64$, $128$, $256$, $320$: unconditionally
+$\sup_{k\in W_m}|g_m(2^k)|\le 2^{-4.97},\ 2^{-8.4},\ 2^{-15.0},\ 2^{-18.4}$
 respectively, and the band-rate inputs (BR) hold on $W_m$ outside the
-critical strip with positive slack at rates $0.0350$, $0.0406$, $0.0457$
---- a rate that plateaus at $0.0457$ from $m=192$ on, the product-bound
-rates near the window edge extrapolating to $\approx 0.049$
+critical strip with positive slack at rates $0.0350$, $0.0406$, $0.0457$,
+$0.0481$ --- a rate that rises slowly with $m$, the product-bound rates
+near the window edge extrapolating to $\approx 0.049$
 (Section~\ref{sec:instances}). Statements about
 $\delta_m$ itself at fixed $m$ additionally require the extremal frequency
 to lie in $W_m$, which is verified exhaustively for $m\le 15$.
@@ -780,11 +780,12 @@ Assume Hypothesis~\ref{hyp:clocal}, and assume the band-rate estimates
 \end{itemize}
 Then $\delta_m\le C\,\mathrm{poly}(m)\,2^{-r(\mu)m}$. Numerically, (BR)
 is certified on the extended window with $\mu=-0.14$ ($r=0.0457$) at
-$m=192$ and $256$ (Theorem~\ref{thm:instances}); the value $\mu=-0.16$
-($r=0.0504$) obtained from rates sampled at $m=240$ is not stable under
-finer sampling in $m$, and the certified product-bound rates near the
-window edge extrapolate to $\approx 0.049$ (Remark~\ref{rem:instscope}),
-so we claim only $r>0.045$.
+$m=192$, $256$ and with $\mu=-0.15$ ($r=0.0481$) at $m=320$
+(Theorem~\ref{thm:instances}); the value $\mu=-0.16$ ($r=0.0504$)
+obtained from rates sampled at $m=240$ is not reached by the certified
+computations up to $m=320$, and the certified product-bound rates near
+the window edge extrapolate to $\approx 0.049$
+(Remark~\ref{rem:instscope}), so we claim only $r>0.045$.
 \end{proposition}
 
 \begin{proof}[Proof architecture]
@@ -847,7 +848,9 @@ m=64: & 207\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-4.97}, &
 m=128: & 313\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-8.4}, &
 \mu=-0.12,\ r=0.0406, & \text{slack } +0.021;\\
 m=256: & 525\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-15.0}, &
-\mu=-0.14,\ r=0.0457, & \text{slack } +0.010.
+\mu=-0.14,\ r=0.0457, & \text{slack } +0.010;\\
+m=320: & 632\ \text{freq.}, & \sup_{W_m}|g_m|\le 2^{-18.4}, &
+\mu=-0.15,\ r=0.0481, & \text{slack } +0.0035.
 \end{array}
 \]
 Here the window supremum bound is unconditional, and the last two columns
@@ -858,13 +861,16 @@ budgeted numerical error is inside $U_m$).
 \end{theorem}
 
 \begin{remark}[scope]\label{rem:instscope}
-(i) Finer sampling in $m$ shows that the certified constraint rate has
-already plateaued: $\mu=-0.10,-0.11,-0.12,-0.13,-0.14,-0.14$ at
-$m=64,96,128,160,192,256$ ($r=0.0350,0.0379,0.0406,0.0432,0.0457,0.0457$),
-with the binding constraints in the shoulder band $u\in[-13,-9]$. The
-certified window rates fit $a_{\min}(m)=0.0491+0.31\log_2 m/m$ to within
-$10^{-4}$ over $m=64$--$256$ (shoulder band: $0.048+0.40\log_2 m/m$), so the product-bound rates near the window edge
-extrapolate to $\approx 0.048$--$0.049$, below $r(-0.16)=0.0504$; the
+(i) Finer sampling in $m$ shows that the certified constraint rate rises
+slowly: $\mu=-0.10,-0.11,-0.12,-0.13,-0.14,-0.14,-0.15$ at
+$m=64,96,128,160,192,256,320$
+($r=0.0350,0.0379,0.0406,0.0432,0.0457,0.0457,0.0481$), with the binding
+constraints in the shoulder band $u\in[-13,-9]$ and the slack shrinking to
+$+0.0035$ at $m=320$. The certified window rates fit
+$a_{\min}(m)=0.0494+0.30\log_2 m/m$ to within $4\times 10^{-4}$ over
+$m=64$--$320$ (shoulder band: $0.048+0.40\log_2 m/m$), so the
+product-bound rates near the window edge extrapolate to
+$\approx 0.048$--$0.049$, below $r(-0.16)=0.0504$; the
 $(\log_2 m)/m$ correction is the finite-size trace of the logarithmic loss
 that Hypothesis~\ref{hyp:clocal} is meant to remove. Whether the sampled
 rate $0.0504$ is attainable by this bookkeeping is therefore open, and we
@@ -873,8 +879,8 @@ of the extremal frequency, $\delta_m=\sup_{W_m}|g_m|$ and the exact window
 computation gives the much smaller true value
 (e.g.\ $\log_2\delta_{256}\approx-30.7$); the product bound is the
 \emph{certifiable} envelope, not the truth. (iii) The error accounting:
-the step law is truncated at $b\le B(m)$, $B=41,65,112$ for
-$m=64,128,256$, chosen so that the omitted mass
+the step law is truncated at $b\le B(m)$, $B=41,65,112,135$ for
+$m=64,128,256,320$, chosen so that the omitted mass
 $(m/2)\sum_{b>B}(b-1)2^{-b}$ (union bound, $|f|\le 1$) is below
 $2^{-0.35m-8}$; pruned dynamic program states are added back at their true
 scale (future factors are at most $1$), with an $m$-adaptive threshold
