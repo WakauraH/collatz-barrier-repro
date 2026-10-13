@@ -31,6 +31,8 @@ no mathlib).
 | Corollary (counting): exact identity brute force vs c(j)*2^(m-j) (m <= 18), exponent convergence, margin bound B(j) < 2^j (j <= 24) | `python exp28_exceptional_count.py` | "all checks passed", B(j) table |
 | Appendix A cycle bound k >= 8,963,457,696 | `python cyclebound.py` | exact-integer reconstruction of the bound |
 | Corollary 6.6 (counting): for all n in (2^m, 2^{m+1}] staying >= n for m steps, e >= m*theta_M, and #{n} <= sum_{e >= m theta_M} C(m,e) <= 2^{m H(theta_M)} (m <= 22; at m = 20 the count equals c(20) = 27328) | `python exp32_regression_checks.py` (part 1) | "all regression checks passed" |
+| Theorem 7.4 (sharp growth c(k) = Theta(C(k,e0)/k)): exact c(k) and N_k(e) for k <= 1200, R(k) = k c(k)/C(k,e0) in [11.6, 20.7], kN_k(e)/(C(k,e)(1+D')) in [0.91, 2.12], regression slope of log2 R on log2 k = 0.07 | `python exp33_sharp_growth.py 1200` | ratios bounded; fit c2 = 1.43 on [200,1200] |
+| Theorem 7.4 auxiliary bounds (F1)-(F3) and the bridge bound, by exact DP: sqrt(n) P_y(tau>n)/(1+y) <= 1.51 (forward and reversed walks, n <= 3200, y <= 25); k^{3/2} P(tau>k, B_k=e)/(1+D') in [0.24, 2.41] (k <= 1600) | `python exp34_ballot_bounds.py` | "all ballot-bound checks passed" |
 
 ## Frozen-artifact hashes (SHA-256)
 

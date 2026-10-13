@@ -26,6 +26,8 @@
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
 \newcommand{\ceil}[1]{\lceil #1\rceil}
 \newcommand{\floor}[1]{\lfloor #1\rfloor}
 
@@ -50,8 +52,8 @@ of dyadic affine descent certificates, and we prove quantitative lower
 bounds on its complexity. In every correct system the certificates deeper
 than $k$ must occupy all $c(k)$ climbing classes mod $2^k$, and truncation
 at depth $K$ leaves uncovered density $c(K)/2^K$; $c(k)$ grows exactly like
-the binary entropy $H(\log_3 2)=0.9500$ per digit, with non-asymptotic
-two-sided constants. The frontier is unchanged under disjunctions of
+the binary entropy $H(\log_3 2)=0.9500$ per digit, with sharp order
+$c(k)\asymp 2^{H(\log_3 2)k}k^{-3/2}$. The frontier is unchanged under disjunctions of
 congruence classes of arbitrary moduli and adaptive stopping times
 (Terras's coefficient stopping time), and an elementary count bounds the
 potential counterexamples up to $N$ by $O(N^{H(\log_3 2)})$. The frontier
@@ -67,7 +69,7 @@ forms in logarithms; machine-verified proof.
 \noindent\textbf{2020 Mathematics Subject Classification:} Primary 11B83;
 Secondary 68R15, 03F20, 11J86.
 
-\noindent\textbf{Word count:} approximately 6{,}600 words.
+\noindent\textbf{Word count:} approximately 7{,}200 words.
 
 \section{Introduction}\label{sec:intro}
 
@@ -124,7 +126,9 @@ and arbitrary mixtures of depths, and we establish the following.
   $\theta=\log_3 2$, whence
   $\gamma=\lim_k \tfrac1k\log_2 c(k) = H(\theta) = 0.9499555272\ldots$
   The lower bound rests on an elementary rotation lemma of independent
-  interest.
+  interest, and a fluctuation-theory argument shows it is sharp up to
+  constants: $c(k)\asymp\binom{k}{\ceil{\theta k}}/k$, i.e.\
+  $\log_2c(k)=H(\theta)k-\tfrac32\log_2k+O(1)$ (Theorem~\ref{thm:Bsharp}).
 \item[(iii)] \emph{Fine structure} (Theorems~C--E): the climbing condition
   factorizes over the Sturmian word of slope $\theta$; block transfer
   matrices obey the standard-word recursion governed by the continued
@@ -752,6 +756,140 @@ $\tilde b(k)=\log_2 c(k)-\log_2\binom{k}{\ceil{\theta k}}$ stays within the
 proven window $[-\log_2 k,\ \log_2(k+1)]$ throughout.
 \end{remark}
 
+\begin{theorem}[sharp growth]\label{thm:Bsharp}
+There are absolute constants $0<c_1\le c_2<\infty$ such that for all
+$k\ge 1$
+\[
+c_1\,\frac1k\binom{k}{\ceil{\theta k}}\ \le\ c(k)\ \le\
+c_2\,\frac1k\binom{k}{\ceil{\theta k}},
+\qquad\text{hence}\qquad
+\log_2 c(k)=H(\theta)\,k-\tfrac32\log_2 k+O(1).
+\]
+More precisely, writing $N_k(e)$ for the number of climbing words of
+length $k$ with $e$ ones and $D'=e-\theta k$, one has
+$N_k(e)\le c_2\binom{k}{e}(1+D')/k$ whenever $0<D'\le\sqrt k$.
+\end{theorem}
+
+The lower bound is Theorem~B (with $c_1=1$); the content is the upper
+bound, which says that the rotation lemma is sharp on average: a cyclic
+class of words with $e$ ones contains $O(1+D')$ climbing rotations, not
+$O(k)$. The proof is a ballot estimate for a Bernoulli bridge against a
+line of irrational slope, obtained from fluctuation theory; sharp
+asymptotics for such conditioned local probabilities are known in far
+greater generality \cite{Caravenna2005,VatutinWachtel2009}, but since
+only upper bounds are needed we give a short self-contained argument
+whose single imported fact is the harmonicity of the ladder-height
+renewal function \cite{Tanaka1989,BertoinDoney1994}.
+
+\begin{proof}
+Let the letters of a word of length $k$ be i.i.d.\ with
+$\Prob(1)=\theta$, let $B_j$ be the number of ones among the first $j$
+letters, and set $S_j:=B_j-\theta j$. Then $(S_j)$ is a mean-zero random
+walk with steps $1-\theta$ (probability $\theta$) and $-\theta$
+(probability $1-\theta$), and the word is climbing iff $S_j>0$ for
+$1\le j\le k$, i.e.\ iff $\tau>k$ where $\tau:=\min\{j\ge1: S_j\le 0\}$.
+Since $\theta$ is irrational, $S_j\ne 0$ for $j\ge1$, and more generally
+$S_j\ne S_i$ for $i<j$. Conditionally on $B_k=e$ the word is uniform
+among words with $e$ ones, so
+\begin{equation}\label{eq:Nke}
+N_k(e)=\binom{k}{e}\,\frac{\Prob(\tau>k,\ B_k=e)}{\Prob(B_k=e)} .
+\end{equation}
+For $y\ge 0$ write $\Prob_y$ for the walk started at $S_0=y$ (i.e.\
+$S_j=y+B_j-\theta j$), with the same $\tau$. We use three facts.
+
+\emph{(F1) Local bounds for the binomial.} There are constants
+$c_0,C_0>0$ with $\sup_z\Prob(B_m=z)\le C_0m^{-1/2}$ for all $m\ge1$, and
+$\Prob(B_k=e)\ge c_0k^{-1/2}$ whenever $|e-\theta k|\le\sqrt k$
+(Stirling). The same holds for the number of zeros, hence for any walk
+whose increments take two values with fixed probabilities.
+
+\emph{(F2) Harmonic renewal function.} Let $H_1,H_2,\ldots$ be the
+descending ladder heights of $(S_j)$ under $\Prob_0$ (the successive
+amounts by which new minima undercut old ones; strict and weak ladder
+heights coincide here because the walk never revisits a level). Each
+$H_i\in(0,\theta]$, since the walk descends only by steps of size
+$\theta$, and $\mu:=\E H_1>0$. The renewal function
+$V(y):=\sum_{i\ge0}\Prob(H_1+\cdots+H_i\le y)$ satisfies the classical
+identity $V(y)=\E_y[V(S_1);\,S_1>0]$ for $y>0$
+\cite{Tanaka1989,BertoinDoney1994}, hence by iteration
+$V(y)=\E_y[V(S_n);\,\tau>n]$ for all $n$. Moreover $y\le V(y)\le (y+1)/\mu$:
+the lower bound because the ladder sums increase by at most $1$ per
+step, the upper bound by Wald's identity applied to the first ladder sum
+exceeding $y$.
+
+\emph{(F3) Uniform persistence bound.} We claim
+$u_n(y):=\Prob_y(\tau>n)\le C_1(1+y)n^{-1/2}$ for all $n\ge1$, $y\ge0$.
+Fix $\varepsilon\in(0,1)$, $n\ge 2$, $y>0$, and $m=\floor{n/2}$. By (F2)
+and Markov's inequality, since $V$ is non-decreasing and $V(x)\ge x$,
+\[
+\Prob_y(\tau>n,\ S_n>\varepsilon\sqrt n)\le
+\frac{\E_y[V(S_n);\tau>n]}{V(\varepsilon\sqrt n)}
+\le\frac{V(y)}{\varepsilon\sqrt n}\le\frac{(1+y)}{\mu\,\varepsilon\sqrt n}.
+\]
+On the complementary event, by the Markov property at time $m$ and (F1),
+$\Prob_y(\tau>n,\ S_n\le\varepsilon\sqrt n)\le u_m(y)\cdot
+\sup_x\Prob\bigl(x+S_{n-m}\in(0,\varepsilon\sqrt n]\bigr)
+\le u_m(y)\cdot C_0(\varepsilon\sqrt n+1)(n-m)^{-1/2}$,
+because $S_{n-m}$ lives on a translate of $\mathbb Z$ and the interval
+contains at most $\varepsilon\sqrt n+1$ lattice points. Choosing
+$\varepsilon=1/(8C_0)$ and $n\ge n_0:=(8C_0)^2$ gives
+$u_n(y)\le \tfrac12u_{\floor{n/2}}(y)+C(1+y)n^{-1/2}$, and iterating
+$j=\floor{\log_2(n/n_0)}$ times yields
+$u_n(y)\le 2^{-j}+C(1+y)n^{-1/2}\sum_{i\ge0}2^{-i/2}\le C_1(1+y)n^{-1/2}$.
+The case $y=0$ follows by conditioning on the first step
+($S_1>0$ forces $S_1=1-\theta$), and $n<n_0$ is trivial. The same bound
+holds for the \emph{reversed} walk $\hat S$ with steps $\theta$
+(probability $1-\theta$) and $-(1-\theta)$ (probability $\theta$), whose
+ladder heights lie in $(0,1-\theta]$.
+
+\emph{The bridge bound.} Let $0<D'=e-\theta k\le\sqrt k$ and
+$m=\floor{k/2}$, $n=k-m$. By the Markov property at time $m$,
+$\Prob(\tau>k,B_k=e)=\sum_z\Prob(\tau>m,B_m=z)\,
+\Prob_{y_z}(\tau>n,\ S_n=D')$ with $y_z=z-\theta m>0$. Reading the last
+$n$ letters backwards turns a path from $y_z$ to $D'$ that stays positive
+into a path of the reversed walk from $D'$ to $y_z$ that stays positive;
+since the letters are i.i.d., $\Prob_{y_z}(\tau>n,S_n=D')=
+\hat\Prob_{D'}(\hat\tau>n,\hat S_n=y_z)$. Splitting once more at time
+$\floor{n/2}$ and using (F3) for $\hat S$ and then (F1),
+\[
+\hat\Prob_{D'}(\hat\tau>n,\hat S_n=y_z)\le
+\hat\Prob_{D'}(\hat\tau>\floor{n/2})\cdot\sup_x\hat\Prob(\hat S_{n-\floor{n/2}}=x)
+\le \frac{C_1(1+D')}{\sqrt{n/2}}\cdot\frac{C_0}{\sqrt{n/2}}\le\frac{C(1+D')}{k}.
+\]
+Summing over $z$ and using (F3) once more,
+$\Prob(\tau>k,B_k=e)\le C(1+D')k^{-1}\Prob(\tau>m)\le C'(1+D')k^{-3/2}$.
+With \eqref{eq:Nke} and the lower bound in (F1) this gives
+$N_k(e)\le c_2\binom ke(1+D')/k$.
+
+\emph{Summation.} Let $e_0=\ceil{\theta k}$ and $e=e_0+j$. Since
+$e_0\ge\theta k$, $\binom{k}{e+1}/\binom ke=(k-e)/(e+1)\le(1-\theta)/\theta
+=:\rho<0.6$, so $\binom{k}{e_0+j}\le\rho^j\binom k{e_0}$, and
+$D'_e\le j+1$. Hence
+\[
+c(k)=\sum_{e\ge e_0}N_k(e)\le
+\frac{c_2}{k}\binom k{e_0}\sum_{j\ge0}(j+2)\rho^j+
+\binom k{e_0}\sum_{j>\sqrt k}\rho^j
+\le C\,\frac1k\binom k{e_0},
+\]
+the tail being $O(\rho^{\sqrt k})=O(1/k)$. Finally
+$\binom{k}{\ceil{\theta k}}=2^{H(\theta)k}k^{-1/2}\,2^{O(1)}$ by Stirling,
+since $k\,|H(\ceil{\theta k}/k)-H(\theta)|=O(1)$.
+\end{proof}
+
+\begin{remark}\label{rem:Bsharpnum}
+Numerically $R(k):=k\,c(k)/\binom{k}{\ceil{\theta k}}$ lies in
+$[11.6,\,20.7]$ for $200\le k\le1200$ (exact values), with no trend in
+$k$ (the regression slope of $\log_2R$ on $\log_2k$ is $0.07$) and a
+monotone dependence on the offset $\ceil{\theta k}\log_23-k\in(0,\log_23)$,
+as the $(1+D')$ factor predicts; the finer ratios
+$kN_k(e)/\bigl(\binom ke(1+D')\bigr)$ stay in $[0.91,2.12]$. The three
+auxiliary bounds (F1)--(F3) and the bridge bound were also checked by
+exact dynamic programming (supplementary scripts). A least-squares fit of
+$\log_2c(k)=H(\theta)k-c_2'\log_2k+c_0$ on $[200,1200]$ returns
+$c_2'=1.43$; the deviation from $\tfrac32$ is the $O(1)$ oscillation,
+not a different exponent.
+\end{remark}
+
 \begin{corollary}[density; classical in content]\label{cor:density}
 The natural density of the union of climbing classes at depth $k$ is
 $c(k)/2^k=2^{-(1-H(\theta))k+o(k)}$, with $1-H(\theta)=0.0500444728\ldots$;
@@ -1092,7 +1230,8 @@ Of the main results, Theorem~A (modulo the trivial reading of an
 injection as a statement about distinct classes), the binomial
 sandwich of Theorem~B, and the combinatorial core of
 Corollary~\ref{cor:count} are thus machine-verified, while the entropy limit
-in Theorem~B (Fekete and Stirling) and the remaining steps of A$'$, as
+in Theorem~B (Fekete and Stirling), the sharp growth of
+Theorem~\ref{thm:Bsharp}, and the remaining steps of A$'$, as
 well as Theorems~C--G, are verified by conventional proof plus the
 independent computations described above. The three core files use no
 library at all and can be checked in seconds; the Mathlib project requires
@@ -1326,6 +1465,26 @@ M.~Sharpe,
 density, and cycle theorems},
 preprint and Lean~4 development (June 2026),
 \url{https://github.com/msharpe248/collatz}.
+
+\bibitem{Tanaka1989}
+H.~Tanaka,
+\emph{Time reversal of random walks in one-dimension},
+Tokyo J. Math. \textbf{12} (1989), 159--174.
+
+\bibitem{BertoinDoney1994}
+J.~Bertoin and R.~A. Doney,
+\emph{On conditioning a random walk to stay nonnegative},
+Ann. Probab. \textbf{22} (1994), 2152--2167.
+
+\bibitem{Caravenna2005}
+F.~Caravenna,
+\emph{A local limit theorem for random walks conditioned to stay positive},
+Probab. Theory Related Fields \textbf{133} (2005), 508--530.
+
+\bibitem{VatutinWachtel2009}
+V.~A. Vatutin and V.~Wachtel,
+\emph{Local probabilities for random walks conditioned to stay positive},
+Probab. Theory Related Fields \textbf{143} (2009), 177--217.
 
 \bibitem{Lothaire2002}
 M.~Lothaire,
