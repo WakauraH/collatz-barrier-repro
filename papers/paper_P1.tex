@@ -69,7 +69,7 @@ forms in logarithms; machine-verified proof.
 \noindent\textbf{2020 Mathematics Subject Classification:} Primary 11B83;
 Secondary 68R15, 03F20, 11J86.
 
-\noindent\textbf{Word count:} approximately 7{,}200 words.
+\noindent\textbf{Word count:} approximately 7{,}600 words.
 
 \section{Introduction}\label{sec:intro}
 
@@ -128,7 +128,10 @@ and arbitrary mixtures of depths, and we establish the following.
   The lower bound rests on an elementary rotation lemma of independent
   interest, and a fluctuation-theory argument shows it is sharp up to
   constants: $c(k)\asymp\binom{k}{\ceil{\theta k}}/k$, i.e.\
-  $\log_2c(k)=H(\theta)k-\tfrac32\log_2k+O(1)$ (Theorem~\ref{thm:Bsharp}).
+  $\log_2c(k)=H(\theta)k-\tfrac32\log_2k+O(1)$ (Theorem~\ref{thm:Bsharp});
+  the remaining $O(1)$ term is identified, under a local ballot limit, as
+  an explicit function of $\{\theta k\}$ built from the ladder-height
+  renewal function (Theorem~\ref{thm:fluct}).
 \item[(iii)] \emph{Fine structure} (Theorems~C--E): the climbing condition
   factorizes over the Sturmian word of slope $\theta$; block transfer
   matrices obey the standard-word recursion governed by the continued
@@ -899,6 +902,91 @@ $c_2'=1.43$; the deviation from $\tfrac32$ is the $O(1)$ oscillation,
 not a different exponent.
 \end{remark}
 
+\begin{theorem}[fluctuation law]\label{thm:fluct}
+Let $(S_j)$ be the walk of the proof of Theorem~\ref{thm:Bsharp}, let
+$V(x):=\sum_{i\ge0}\Prob(H_1+\cdots+H_i<x)$ be the renewal function of
+its strict ascending ladder heights $H_1,H_2,\ldots$ (equivalently, of the
+descending ladder heights of the reversed walk), let
+$\rho=(1-\theta)/\theta$, $\delta_0(k):=\ceil{\theta k}-\theta k=1-\{\theta k\}$,
+and
+\[
+F(\delta):=\sum_{j\ge0}\rho^{\,j}\,V(\delta+j),\qquad
+\Phi(\delta):=\frac{1}{\sqrt{2\pi\theta(1-\theta)}}\sum_{j\ge0}\rho^{\,\delta+j}V(\delta+j)
+\qquad(0<\delta\le 1).
+\]
+Assume the local ballot limit
+\begin{itemize}
+\item[(LCL)] $k\,\Prob(\tau>k\mid B_k=e)\to V(x)$ as $k\to\infty$ with
+  $e-\theta k\to x$, uniformly for $x$ in compact subsets of $(0,\infty)$
+  avoiding the atoms of the ladder sums.
+\end{itemize}
+Then
+\[
+\frac{k\,c(k)}{\binom{k}{\ceil{\theta k}}}-F(\delta_0(k))\to 0,
+\qquad\text{equivalently}\qquad
+\frac{c(k)}{2^{H(\theta)k}k^{-3/2}}-\Phi(\delta_0(k))\to 0 .
+\]
+\end{theorem}
+
+\begin{proof}
+Write $e=e_0+j$, $e_0=\ceil{\theta k}$, so $e-\theta k=\delta_0+j$. By
+\eqref{eq:Nke} and (LCL), $kN_k(e_0+j)/\binom{k}{e_0+j}\to V(\delta_0+j)$
+for each fixed $j$ (along any sequence of $k$ with $\delta_0(k)\to\delta$),
+and $\binom{k}{e_0+j}/\binom{k}{e_0}\to\rho^j$. The bound
+$kN_k(e)/\binom ke\le c_2(1+e-\theta k)$ of Theorem~\ref{thm:Bsharp}
+together with $\binom{k}{e_0+j}\le\rho^j\binom{k}{e_0}$ gives a summable
+majorant $c_2(j+2)\rho^j$, so dominated convergence yields the first
+limit; the atoms of the ladder sums are countable and $\delta_0(k)$ is
+equidistributed, so they can be avoided along a full-density set of $k$
+and handled by monotonicity of $V$ otherwise. The second form follows
+from Stirling, $\binom{k}{\theta k+\delta}=2^{H(\theta)k}\rho^{\delta}
+(2\pi\theta(1-\theta)k)^{-1/2}(1+o(1))$.
+\end{proof}
+
+Hypothesis (LCL) is the bridge form of the local limit theorem for walks
+conditioned to stay positive \cite{Caravenna2005,VatutinWachtel2009},
+with the constant fixed by Feller's duality (the event $\{\tau>k,\ S_k=x\}$
+is the event that $k$ is a strict ascending ladder epoch with height $x$)
+--- for the simple symmetric walk it reduces to the ballot theorem
+$\Prob(\tau>k\mid S_k=x)=x/k$, $V(x)=x$. Those references treat walks on
+$\mathbb Z$ or with a density; our walk lives on the translates
+$\mathbb Z-\theta j$, and although the proofs go through, we have not
+located a published statement covering this case and therefore record
+(LCL) as a hypothesis. It is confirmed numerically to high precision
+(Remark~\ref{rem:fluctnum}).
+
+\begin{remark}[numerical verification]\label{rem:fluctnum}
+Exact dynamic programming (supplementary script) gives, at $k=1600$ and
+$x=e-\theta k=0.512,\,1.512,\ldots,6.512$, the ratios
+$k\Prob(\tau>k\mid B_k=e)/V(x)=1.002,\,1.006,\ldots,1.027$, the residual
+drift being the truncation of the ladder-height law in the computation
+of $V$ (total mass $0.9976$). The predicted $F(\delta_0)$ reproduces the
+exact $R(k)=k\,c(k)/\binom{k}{\ceil{\theta k}}$ to within $2$--$5\%$ for
+$1000\le k\le 1200$, and $R(k)$ collapses onto a single curve in
+$\delta_0$: the within-bin standard deviation over ten bins of $\delta_0$
+falls from $0.74$ ($100\le k<300$) to $0.28$ ($600\le k<1200$), the
+latter being accounted for by the slope of $F$ within a bin. Thus the
+entire $O(1)$ fluctuation of $\log_2c(k)$, after removing
+$H(\theta)k-\tfrac32\log_2k$, is the single function
+$\log_2\Phi(1-\{\theta k\})$ of the irrational rotation by $\theta$ ---
+this is the quantitative content of the ``first continued-fraction
+tier'' observed in Remark~\ref{rem:sturmnum}.
+\end{remark}
+
+\begin{remark}[toward non-holonomicity]\label{rem:fluctholo}
+$\Phi$ is monotone and has jump discontinuities: the ladder sums have
+atoms (e.g.\ $H_1=1-\theta$ with probability $\theta$), so $V$ jumps at
+$x=1-\theta$ and $\Phi$ jumps at $\delta=1-\theta$. A P-recursive sequence
+has an asymptotic expansion in the Birkhoff--Trjitzinsky class, whose
+oscillatory factors are finite trigonometric sums in $k$
+\cite{FlajoletGerholdSalvy2005}; a leading-order modulation by
+$\Phi(1-\{\theta k\})$ with $\Phi$ discontinuous and $\{\theta k\}$
+equidistributed is incompatible with such an expansion. Under (LCL),
+Theorem~\ref{thm:fluct} would therefore settle
+Conjecture~\ref{conj:precursive}; we leave the details, which require
+the rigorous form of the structure theorem, to future work.
+\end{remark}
+
 \begin{corollary}[density; classical in content]\label{cor:density}
 The natural density of the union of climbing classes at depth $k$ is
 $c(k)/2^k=2^{-(1-H(\theta))k+o(k)}$, with $1-H(\theta)=0.0500444728\ldots$;
@@ -1494,6 +1582,12 @@ Probab. Theory Related Fields \textbf{133} (2005), 508--530.
 V.~A. Vatutin and V.~Wachtel,
 \emph{Local probabilities for random walks conditioned to stay positive},
 Probab. Theory Related Fields \textbf{143} (2009), 177--217.
+
+\bibitem{FlajoletGerholdSalvy2005}
+P.~Flajolet, S.~Gerhold, and B.~Salvy,
+\emph{On the non-holonomic character of logarithms, powers, and the
+$n$th prime function},
+Electron. J. Combin. \textbf{11} (2005), no.~2, A2.
 
 \bibitem{Lothaire2002}
 M.~Lothaire,
