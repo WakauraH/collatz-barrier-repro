@@ -154,9 +154,9 @@ and arbitrary mixtures of depths, and we establish the following.
   by genuine integer orbit segments at every window length.
 \item[(vii)] \emph{A power-saving counterexample count}
   (Corollary~\ref{cor:count}): unconditionally, the number of $n\le N$
-  whose orbit never descends below $n$ is $O(N^{H(\theta)})$, by an
-  elementary argument: the counting exponent is the certificate growth
-  rate $H(\theta)=0.9500$ itself.
+  whose orbit never descends below $n$ is $O(N^{H(\theta)}/\sqrt{\log N})$,
+  by an elementary argument: the counting exponent is the certificate
+  growth rate $H(\theta)=0.9500$ itself.
 \end{enumerate}
 
 We stress an explicit non-claim. The density exponent $1-H(\theta)$
@@ -573,8 +573,9 @@ integers whose orbit never descends below its starting point. (The least
 element of any divergent orbit and of any nontrivial cycle lies in
 $\mathcal{E}$, and the conjecture is equivalent to
 $\mathcal{E}=\emptyset$.) Then, unconditionally and with an absolute constant $C$,
+for all $N\ge 2$,
 \[
-|\mathcal{E}\cap[1,N]|\ \le\ C\,N^{\,H(\theta)},\qquad
+|\mathcal{E}\cap[1,N]|\ \le\ C\,\frac{N^{\,H(\theta)}}{\sqrt{\log N}},\qquad
 H(\theta)=0.9499555\ldots :
 \]
 the counting exponent equals the certificate growth rate $\gamma$.
@@ -591,12 +592,19 @@ $(3n'+1)/(2n')\le (3+1/M)/2$ and an even step by $1/2$; hence
 \theta_M:=\frac{\log 2}{\log(3+1/M)}=\theta-O(1/M).
 \]
 By Lemma~\ref{lem:terras}(c), each parity vector of length $m$ occurs
-for exactly one integer of $(M,2M]$, so
-$|\mathcal{E}\cap(M,2M]|\le\sum_{e\ge m\theta_M}\binom{m}{e}
-\le 2^{mH(\theta_M)}$ (the entropy bound, valid since $\theta_M>1/2$).
-As $m\,(H(\theta_M)-H(\theta))=O(m/M)\to 0$, this is at most
-$C_0\,2^{mH(\theta)}=C_0M^{H(\theta)}$ with an absolute $C_0$, and summing
-over the dyadic blocks $M=2^m\le N$ gives the claim.
+for exactly one integer of $(M,2M]$, so, with $e_1=\ceil{m\theta_M}$,
+\[
+|\mathcal{E}\cap(M,2M]|\le\sum_{e\ge e_1}\binom{m}{e}
+\le\frac{1}{1-\rho}\binom{m}{e_1}\le C_0\,\frac{2^{mH(\theta_M)}}{\sqrt m},
+\]
+where $\rho=(m-e_1)/(e_1+1)\le(1-\theta_M)/\theta_M<0.6$ bounds the ratio of
+consecutive binomial coefficients beyond $e_1>m/2$, and the last step is
+Stirling's bound $\binom{m}{e}\le C\,2^{mH(e/m)}m^{-1/2}$ for
+$e/m$ in a compact subinterval of $(0,1)$. As
+$m\,(H(\theta_M)-H(\theta))=O(m/M)\to 0$, this is at most
+$C_0'\,M^{H(\theta)}(\log_2 M)^{-1/2}$ with an absolute $C_0'$, and summing
+over the dyadic blocks $M=2^m\le N$ (a geometric sum dominated by its
+largest term) gives the claim.
 \end{proof}
 
 \begin{remark}\label{rem:countnum}
@@ -632,8 +640,9 @@ $\#\{n\in[2^k,2^{k+1}):\text{no descent within } k \text{ steps}\}
 \le 3^k/2^{\lfloor 17(k-1)/27\rfloor}\approx 2^{0.955k}$, where the
 rational approximation $3^{17}\le 2^{27}$ replaces the entropy function;
 the corollary sharpens the exponent to the exact entropy value
-$H(\theta)=0.94996\ldots$ with an absolute constant and identifies it
-with the certificate growth rate $\gamma$. The recent parity-vector
+$H(\theta)=0.94996\ldots$ with an absolute constant (and a
+$(\log N)^{-1/2}$ saving from the binomial ratio bound) and identifies
+it with the certificate growth rate $\gamma$. The recent parity-vector
 literature enumerates paradoxical \emph{windows} \cite{Niu2026} and shows
 that finiteness of the set of paradoxical sequences implies the
 conjecture \cite[Cor.~3.3]{RozierTerracol2026}. We are not aware of a
